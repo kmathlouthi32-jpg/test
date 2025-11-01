@@ -7,7 +7,7 @@ import psutil, os
 
 keep_alive()
 
-bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ4')
+bot = Bot(token='7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q')
 dp = Dispatcher()
 
 
@@ -87,4 +87,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
