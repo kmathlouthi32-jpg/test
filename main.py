@@ -5,10 +5,12 @@ from utils import init_db, create_tables, escape_markdown, keep_alive
 
 from handlers import *
 
+keep_alive()
+
 bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ4')
 dp = Dispatcher()
 
-keep_alive()
+
 
 import psutil, os
 
@@ -85,4 +87,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
