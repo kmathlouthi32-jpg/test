@@ -1,18 +1,16 @@
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 import asyncio
-from utils import init_db, create_tables, escape_markdown, keep_alive
-
+from utils import init_db, create_tables, escape_markdown, keepalive
 from handlers import *
+import psutil, os
 
-keep_alive()
+keepalive()
 
-bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ')
+bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ4')
 dp = Dispatcher()
 
 
-
-import psutil, os
 
 def get_memory_usage():
     process = psutil.Process(os.getpid())
@@ -71,9 +69,11 @@ dp.callback_query.register(changevoice_callback, lambda c: c.data in ['Michael',
 dp.message.register(ban_command, Command(commands=["ban"]))
 dp.message.register(unban_command, Command(commands=["unban"]))
 dp.message.register(keys_command, Command(commands=["keys"]))
+dp.message.register(generate_keys_command, Command(commands=["gkeys"]))
 
 # CALLBACKS
 dp.callback_query.register(keys_callback, lambda c: c.data=='keys')
+dp.callback_query.register(generate_keys_callback, lambda c: c.data=='g_keys')
 dp.callback_query.register(get_keys_callback, lambda c: c.data in ['2 hours','1 day','4 days','1 week','1 month'])
 
 dp.message.register(unknown_command,lambda message: message.text and message.text.startswith('/'))
@@ -87,6 +87,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
