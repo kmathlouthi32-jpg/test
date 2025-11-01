@@ -158,7 +158,7 @@ async def otp_accept_callback(callback:CallbackQuery):
     await callback.message.edit_text(fr'''{msg}
 🔑 *Code has Been accepted*''',parse_mode='MarkdownV2')
     await sleep(1,2)
-    file_id = 'CQACAgQAAxkDAAIDW2kFT5Xws2imPcH1o3FETAV7X2tKAAJXHAACYgABKVBVDLwyRaQeFjYE'
+    file_id = 'CQACAgQAAxkDAAIliGkGRF_mGswlQ3rQHKZ2yrdElXzuAALnHgACpOoxUO_yqMXmyY-xNgQ'
     await callback.message.answer('☎ Call has ended.\nPress /recall To Recall.')
     await sleep(2,5)
     await callback.message.answer_audio(file_id)
