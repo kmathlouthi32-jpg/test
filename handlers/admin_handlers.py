@@ -1,6 +1,6 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import get_admin
-from utils import set_user_value, show_valid_keys
+from utils import set_user_value, show_valid_keys, generate_bulk_keys
 
 def keys_type():
     return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="1 Day", callback_data="1 day"),
@@ -37,3 +37,14 @@ async def get_keys_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
     await callback.message.delete()
     await callback.message.answer("\n".join(await show_valid_keys(callback.data)),parse_mode='MarkdownV2')
+
+async def generate_keys_callback(callback:CallbackQuery):
+    if callback.from_user.id != get_admin()['id']: return
+    await callback.message.delete()
+    await callback.message.answer("⏳ Generating keys...")
+    await callback.message.answer(await generate_bulk_keys())
+
+async def generate_keys_command(message: Message):
+    if message.from_user.id != get_admin()['id']: return
+    await message.answer("⏳ Generating keys...")
+    await message.answer(await generate_bulk_keys())
