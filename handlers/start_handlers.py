@@ -42,10 +42,12 @@ def start_keyboard():
 def admin_start_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="🔑 Keys", callback_data='keys')
+            InlineKeyboardButton(text="🔑 Keys", callback_data='keys'),
+            InlineKeyboardButton(text="⚙️ Commands", callback_data="help")
         ],
         [
-            InlineKeyboardButton(text="⚙️ Commands", callback_data="help")
+            
+            InlineKeyboardButton(text="🔑 generate keys", callback_data='g_keys')
         ]
     ])
 
