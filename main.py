@@ -1,11 +1,11 @@
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 import asyncio
-from utils import init_db, create_tables, escape_markdown, keepalive
+from utils import init_db, create_tables, escape_markdown, keep_alive
 from handlers import *
 import psutil, os
 
-keepalive()
+keep_alive()
 
 bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ4')
 dp = Dispatcher()
@@ -87,3 +87,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
