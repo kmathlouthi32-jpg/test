@@ -7,7 +7,7 @@ from handlers import *
 
 keep_alive()
 
-bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ4')
+bot = Bot(token='8276206384:AAGH6-LHRyqhZixP28Kum-VYRthyZqQgKJ')
 dp = Dispatcher()
 
 
@@ -87,5 +87,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
