@@ -92,10 +92,6 @@ async def get_user_count():
         row = await conn.fetchrow("SELECT COUNT(*) AS count FROM users")
         return row["count"]
 
-async def reset_all_user_actions():
-    async with POOL.acquire() as conn:
-        await conn.execute("UPDATE users SET In_Action = 'N/A'")
-
 # -------------------------------
 # 🔑 KEYS OPERATIONS
 # -------------------------------
@@ -137,9 +133,16 @@ async def generate_new_key(conn, key_type: str):
     return new_key
 
 
-async def generate_bulk_keys(pool, total_per_duration=50):
+async def generate_bulk_keys(pool=POOL, total_per_duration=10):
     """Generate multiple new keys for all durations."""
     durations = DURATION_MAP.keys()
+
+    # Ensure pool exists
+    global POOL
+    if pool is None:
+        await init_db()
+        pool = POOL  # ✅ reassign after init
+
     async with pool.acquire() as conn:
         async with conn.transaction():
             for duration in durations:
@@ -152,7 +155,8 @@ async def generate_bulk_keys(pool, total_per_duration=50):
                         )
                     except Exception:
                         pass  # Skip duplicates silently
-    print("✅ Keys generated and added.")
+    return "✅ Keys generated and added."
+
 
 
 # -------------------------------
