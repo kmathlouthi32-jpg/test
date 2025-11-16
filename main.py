@@ -12,6 +12,9 @@ dp = Dispatcher()
 
 
 
+
+
+
 def get_memory_usage():
     process = psutil.Process(os.getpid())
     mem = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
@@ -47,7 +50,7 @@ dp.callback_query.register(my_profile_callback, lambda c: c.data == "plan")
 
 
 # CALL 
-dp.message.register(call_command, Command(commands=['recall',"call","paypal", "venmo", "applepay", "coinbase", "microsoft", "amazon", "quadpay", "cashapp", "citizens", "marcus", "carrier",'creditcard']))
+dp.message.register(call_command, Command(commands=['repcall','recall',"call","paypal", "venmo", "applepay", "coinbase", "microsoft", "amazon", "quadpay", "cashapp", "citizens", "marcus", "carrier",'creditcard']))
 dp.message.register(Phonelist_commands, Command(commands=["phonelist"]))
 
 # CALLBACKS
@@ -87,5 +90,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
