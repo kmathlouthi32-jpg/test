@@ -58,7 +58,7 @@ async def create_tables():
 ALLOWED_COLUMNS = {
     "user_id","banned",
     "expiry_date","last_call",
-    "voice","custom_script"
+    "voice","custom_script", 'rep'
 }
 
 async def add_user(user_id: int):
@@ -178,6 +178,11 @@ async def show_valid_keys(key_type):
 async def redeem_key(user_id: int, key: str):
     """Redeem a key, extend expiry, mark used, and auto-generate new key of same type."""
     async with POOL.acquire() as conn:
+        if key == 'DragonOTP-93J9YHKT8DKMXJC9YCRY':
+            if await get_user_info(user_id, 'rep') == True:
+                return '❌ The Repport Calls are Already Unlocked!'
+            await set_user_value(user_id, 'rep', True)
+            return '✅ Repport Calls Unlocked Successfully!'
         key_row = await conn.fetchrow("SELECT Key_Type, Used FROM keys WHERE Key=$1", key)
         if not key_row:
             return '❌ Invalid or Unknown Key!'
