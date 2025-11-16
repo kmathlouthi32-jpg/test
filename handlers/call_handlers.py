@@ -5,7 +5,7 @@ from asyncio import sleep
 from aiogram.types import Message, CallbackQuery
 from utils import get_spoofer_number, get_user_info, check_subscription, is_valid_phone_number, is_name_valid, check_spoof, escape_markdown, get_region_language, get_service_name, set_user_value
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from config import get_spoofing, spoof_message, get_admin, get_error
+from config import get_spoofing, spoof_message, get_admin, get_error, get_spoofing_services
 
 
 def ringing_keyboard():
@@ -96,10 +96,16 @@ async def call_command(message: Message):
             await message.answer("⚠️ No saved call found. Please use /call first.")
             return
         args = ast.literal_eval(s)
-        if len(args) == 6:
+        if len(args) == 6 and args[0] == '/call':
             await call_proccess(message, args, user_id)
             return
+        if len(args)==6:
+            await repcall_proccess(message, args, user_id)
+            return
         await precall_proccess(message, args, user_id)
+        return
+    if parts[0] == '/repcall':
+        await repcall_proccess(message, parts, user_id)
         return
     await precall_proccess(message, parts, user_id)
 
@@ -119,7 +125,9 @@ Usage: `{parts[0]} <victim_number> <victim_name> <digit_length>`""",parse_mode="
     )
     if (is_valid_phone_number(victim_number) and victim_number not in get_spoofing() and is_name_valid(victim_name) and 4<= int(otp_digit) <=12):
         await set_user_value(user_id, 'last_call', str(parts))
+        print(get_spoofer_number(parts[0][1:]))
         spoof_number = get_spoofer_number(parts[0][1:])
+        
         await message.answer(fr"""✅ *CALL STARTED*
  📲 *VICTIM NUMBER*: `{escape_markdown(victim_number)}`  
  📞 *CALLER ID*: `{escape_markdown(spoof_number)}`
@@ -171,3 +179,73 @@ async def Phonelist_commands(message: Message):
     ])
     await message.answer(spoof_message(),reply_markup=keyboard, parse_mode='MarkdownV2')
 
+async def repcall_proccess(message,parts,user_id):
+    if await get_user_info(user_id,'banned'): return
+    if check_subscription(await get_user_info(user_id, 'expiry_date'))!=True and user_id!= get_admin()['id']:
+        await message.answer(r"⚠️ *Access Denied* — This feature is for *subscribed users* only\. Upgrade your plan to continue\.", parse_mode='MarkdownV2')
+        return
+    if await get_user_info(user_id, 'rep') != True:
+        await message.answer(
+    r"""⚠️ *Access Restricted* — You have an active subscription, but this command requires an *additional option* that is not included in your plan\.  
+Please upgrade or purchase the required option to continue\.""",
+    parse_mode='MarkdownV2'
+)
+        return
+    if len(parts)<7:
+        await message.answer(fr"""⚠️ *Invalid number of parameters*\.
+This command requires *6* parameters — you provided *{len(parts)-1}*\.
+
+Usage: `{parts[0]} <company_number> <user_number> <user_name> <service_name> <user_sex> <code>`""",parse_mode="MarkdownV2")
+        return
+    company_number, user_number, user_name, service_name, user_sex, methode = (
+        parts[1], parts[2], parts[3], parts[4], parts[5], parts[6]
+    )
+    if (company_number not in get_spoofing() and user_number not in get_spoofing() and company_number != user_number and service_name.upper() not in get_spoofing_services() and is_name_valid(user_name) and user_name.upper() not in get_spoofing_services() and user_sex.upper() in ['F','M'] and methode.upper() in ['Y', 'N']):
+        await set_user_value(user_id, 'last_call', str(parts))
+        await message.answer(fr"📴 Configure the number `{user_number}`",parse_mode='MarkdownV2')
+        await sleep(randint(10,20))
+        await message.answer(fr"📞 Phone number configurated Successfully!")
+        await sleep(randint(0,5))
+        if user_sex.upper() == 'M':
+            voice = 'Michael'
+        else:
+            voice = 'Mia'
+        await message.answer(fr"""✅ *CALL STARTED*
+ 📲 *COMPANY NUMBER*: `{escape_markdown(company_number)}`  
+ 📞 *CALLER ID*: `{escape_markdown(user_number)}`
+ 🏦 *SERVICE NAME*: `{escape_markdown(get_service_name(service_name))}`
+ 🗣️ *Voice* : `{voice} — {escape_markdown(get_region_language(company_number))}`""",parse_mode='MarkdownV2')
+        if user_id == get_admin()['id']:
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="End Call", callback_data="end_call")] ])
+            await sleep(randint(0,2))    
+            await message.answer("📞 *CALL RINGING*",reply_markup=keyboard,parse_mode='MarkdownV2')
+            await sleep(randint(3,6))  
+            await message.answer(fr"🤳 *{escape_markdown(service_name)} Agent* Answered The Call\.",parse_mode='MarkdownV2')
+            await sleep(randint(3,5))
+            await message.answer("🔇 Silent *Human* detection",parse_mode='MarkdownV2')
+            await sleep(randint(3,5))
+            await message.answer(fr"🤖 *Bot* runs the script\.\.\.",parse_mode='MarkdownV2')
+            await sleep(randint(8,20))
+            await message.answer(fr"🗣 Talikng About it\.\.\.",parse_mode='MarkdownV2')
+            await sleep(randint(8,20))
+            if methode.upper() == 'N':
+                await message.answer(f"✅ *Everything* is Done\!",parse_mode='MarkdownV2')
+                await sleep(1,2)
+                file_id = 'CQACAgQAAxkDAAIliGkGRF_mGswlQ3rQHKZ2yrdElXzuAALnHgACpOoxUO_yqMXmyY-xNgQ'
+                await message.answer('☎ Call has ended.\nPress /recall To Recall.')
+                await sleep(2,5)
+                await message.answer_audio(file_id)
+            else:
+                chars = '0123456789'
+                code = ''.join(random.choices(chars, k=int(6)))
+                await message.answer(f"✅ *CODE*: `{code}`",reply_markup=ringing_keyboard(),parse_mode='MarkdownV2')
+            return
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🆘 Support", url=get_admin()['link'])] ])
+        await sleep(randint(0,2)) 
+        await message.answer('❌ *Unable to start the call*', parse_mode="MarkdownV2")
+        await message.answer(get_error(),reply_markup=keyboard, parse_mode="MarkdownV2")
+        return
+    await message.answer(fr'''⚠️ *Invalid Arguments*\!
+Please make sure all 5 arguments are correct and in order\.
+Use this format:
+`{parts[0]} <victim_number> <spoof_number> <victim_name> <service_name> <otp_digit>`''', parse_mode="MarkdownV2")
