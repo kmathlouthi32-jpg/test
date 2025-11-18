@@ -7,10 +7,11 @@ import random, string
 POOL: asyncpg.Pool = None
 
 DATABASE_URL = 'postgresql://postgres.aoddcnsgkkowtbktnske:dragonotp.bot1234.@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'
+
+
 # -------------------------------
 # 🧩 CONNECTION SETUP
 # -------------------------------
-
 async def init_db():
     """Initialize a global async connection pool."""
     global POOL
@@ -28,6 +29,7 @@ async def init_db():
 # -------------------------------
 # 📦 TABLE CREATION
 # -------------------------------
+
 
 async def create_tables():
     """Create all required tables."""
@@ -52,46 +54,56 @@ async def create_tables():
         );
         """)
 
+
 # -------------------------------
 # 👤 USER OPERATIONS
 # -------------------------------
 
 ALLOWED_COLUMNS = {
-    "user_id","banned",
-    "expiry_date","last_call",
-    "voice","custom_script", 'rep'
+    "user_id", "banned", "expiry_date", "last_call", "voice", "custom_script",
+    'rep'
 }
+
 
 async def add_user(user_id: int):
     async with POOL.acquire() as conn:
-        await conn.execute("""
+        await conn.execute(
+            """
             INSERT INTO users (User_id)
             VALUES ($1)
             ON CONFLICT (User_id) DO NOTHING
         """, user_id)
 
+
 async def set_user_value(user_id: int, col: str, value):
     if col not in ALLOWED_COLUMNS:
         raise ValueError("Invalid column name")
     async with POOL.acquire() as conn:
-        await conn.execute(f"UPDATE users SET {col} = $1 WHERE User_id = $2", value, user_id)
+        await conn.execute(f"UPDATE users SET {col} = $1 WHERE User_id = $2",
+                           value, user_id)
+
 
 async def get_user_info(user_id: int, col: str):
     if col not in ALLOWED_COLUMNS:
         raise ValueError("Invalid column name")
     async with POOL.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT {col} FROM users WHERE User_id = $1", user_id)
+        row = await conn.fetchrow(
+            f"SELECT {col} FROM users WHERE User_id = $1", user_id)
         return row[col] if row else None
+
 
 async def user_exists(user_id: int):
     async with POOL.acquire() as conn:
-        row = await conn.fetchrow("SELECT 1 FROM users WHERE User_id = $1", user_id)
+        row = await conn.fetchrow("SELECT 1 FROM users WHERE User_id = $1",
+                                  user_id)
         return bool(row)
+
 
 async def get_user_count():
     async with POOL.acquire() as conn:
         row = await conn.fetchrow("SELECT COUNT(*) AS count FROM users")
         return row["count"]
+
 
 # -------------------------------
 # 🔑 KEYS OPERATIONS
@@ -111,14 +123,15 @@ DURATION_MAP = {
     '1 month': (timedelta(days=30), '1 Month'),
 }
 
-
 # -------------------------------
 # 🔑 KEY UTILITIES
 # -------------------------------
 
+
 def random_segment(length=20):
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choices(chars, k=length))
+
 
 def generate_key():
     return f"DragonOTP-{random_segment()}"
@@ -129,8 +142,7 @@ async def generate_new_key(conn, key_type: str):
     new_key = generate_key()
     await conn.execute(
         "INSERT INTO keys (Key, Key_Type, Used) VALUES ($1, $2, FALSE)",
-        new_key, key_type
-    )
+        new_key, key_type)
     return new_key
 
 
@@ -152,29 +164,31 @@ async def generate_bulk_keys(pool=POOL, total_per_duration=10):
                     try:
                         await conn.execute(
                             "INSERT INTO keys (Key, Key_Type, Used) VALUES ($1, $2, FALSE)",
-                            key, duration
-                        )
+                            key, duration)
                     except Exception:
                         pass  # Skip duplicates silently
     return "✅ Keys generated and added."
-
 
 
 # -------------------------------
 # 🔍 KEY CHECKING
 # -------------------------------
 
+
 async def show_valid_keys(key_type):
     if key_type not in KEY_TYPES:
         return ['❌ Invalid key type.']
     async with POOL.acquire() as conn:
-        rows = await conn.fetch("SELECT Key FROM keys WHERE Key_Type=$1 AND Used=FALSE", key_type)
-        return [fr"`{r['key']}`" for r in rows] if rows else [r"⚠️ No available keys\."]
+        rows = await conn.fetch(
+            "SELECT Key FROM keys WHERE Key_Type=$1 AND Used=FALSE", key_type)
+        return [fr"`{r['key']}`"
+                for r in rows] if rows else [r"⚠️ No available keys\."]
 
 
 # -------------------------------
 # ⏱️ KEY REDEMPTION LOGIC
 # -------------------------------
+
 
 async def redeem_key(user_id: int, key: str):
     """Redeem a key, extend expiry, mark used, and auto-generate new key of same type."""
@@ -184,7 +198,8 @@ async def redeem_key(user_id: int, key: str):
                 return '❌ The Repport Calls are Already Unlocked!'
             await set_user_value(user_id, 'rep', True)
             return '✅ Repport Calls Unlocked Successfully!'
-        key_row = await conn.fetchrow("SELECT Key_Type, Used FROM keys WHERE Key=$1", key)
+        key_row = await conn.fetchrow(
+            "SELECT Key_Type, Used FROM keys WHERE Key=$1", key)
         if not key_row:
             return '❌ Invalid or Unknown Key!'
         if key_row["used"]:
@@ -200,7 +215,9 @@ async def redeem_key(user_id: int, key: str):
 
         # Determine if user is new or already has valid subscription
         try:
-            exp_dt = datetime.strptime(expiry_str, "%Y-%m-%d %H:%M:%S.%f") if expiry_str != 'N/A' else now
+            exp_dt = datetime.strptime(
+                expiry_str,
+                "%Y-%m-%d %H:%M:%S.%f") if expiry_str != 'N/A' else now
         except Exception:
             exp_dt = now
 
@@ -215,13 +232,15 @@ async def redeem_key(user_id: int, key: str):
 
         # Generate replacement key of same type
         await generate_new_key(conn, key_type_code)
-    
+
         return f'✅ {label} Key Redeemed Successfully!'
+
 
 # -------------------------------
 # 🧪 TEST RUN (for local dev)
 # -------------------------------
 if __name__ == "__main__":
+
     async def main():
         await init_db()
         await create_tables()
