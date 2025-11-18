@@ -1,10 +1,8 @@
-langcodes[data]
 aiogram==3.13.1
+asyncpg==0.29.0
 Flask==3.0.3
 psycopg[binary]==3.2.3
-langcodes==3.3.0
+langcodes[data]==3.3.0
 phonenumbers==8.13.39
 psutil==5.9.8
-asyncpg
-
-
+language_data
