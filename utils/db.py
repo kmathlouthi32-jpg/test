@@ -6,7 +6,7 @@ import random, string
 # --- CONFIG ---
 POOL: asyncpg.Pool = None
 
-DATABASE_URL = 'postgresql://postgres.aoddcnsgkkowtbktnske:dragonotp.bot1234.@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'
+DATABASE_URL = 'postgresql://postgres.aoddcnsgkkowtbktnske:DragonOTPbot123@aws-1-eu-north-1.pooler.supabase.com:6543/postgres'
 
 
 # -------------------------------
@@ -247,3 +247,4 @@ if __name__ == "__main__":
         print("Database ready ✅")
 
     asyncio.run(main())
+
