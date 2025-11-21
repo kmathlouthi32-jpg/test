@@ -75,10 +75,16 @@ async def start_callback(callback: CallbackQuery, bot:Bot):
     if not(await get_user_info(user_id,'banned')):
         name = callback.from_user.first_name
         if callback.data == 'back1':
-            await callback.message.delete()
+            try:
+                await callback.message.delete()
+            except:
+                pass
         else:
-            for i in range(6):
-                await bot.delete_message(user_id,callback.message.message_id-i)
+            try:
+                for i in range(6):
+                    await bot.delete_message(user_id,callback.message.message_id-i)
+            except:
+                pass
         if user_id == get_admin()['id']:
             await callback.message.answer(admin_start_message(name), reply_markup=admin_start_keyboard(),parse_mode='MarkdownV2')
             return
@@ -169,3 +175,4 @@ async def help_callback(callback: CallbackQuery):
 • `/voicelist` — View available voices  
 • `/recall` — Repeat the last victim call
 """, reply_markup=keyboard, parse_mode='MarkdownV2')
+
