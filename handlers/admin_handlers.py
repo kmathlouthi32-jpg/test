@@ -30,17 +30,26 @@ async def keys_command(message: Message):
 
 async def keys_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer("🔑 Select the keys type.",reply_markup=keys_type())
 
 async def get_keys_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer("\n".join(await show_valid_keys(callback.data)),parse_mode='MarkdownV2')
 
 async def generate_keys_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer("⏳ Generating keys...")
     await callback.message.answer(await generate_bulk_keys())
 
@@ -48,3 +57,4 @@ async def generate_keys_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     await message.answer("⏳ Generating keys...")
     await message.answer(await generate_bulk_keys())
+
