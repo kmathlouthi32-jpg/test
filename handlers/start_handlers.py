@@ -141,7 +141,10 @@ async def help_callback(callback: CallbackQuery):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]
     ])
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer(r"""*CROWS OTP — Commands Panel*
     
 ❓ *Core Commands*
@@ -175,4 +178,5 @@ async def help_callback(callback: CallbackQuery):
 • `/voicelist` — View available voices  
 • `/recall` — Repeat the last victim call
 """, reply_markup=keyboard, parse_mode='MarkdownV2')
+
 
