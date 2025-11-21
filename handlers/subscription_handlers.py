@@ -110,14 +110,20 @@ async def purchase_command(message):
 async def purchase_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
     if await get_user_info(user_id,'banned') == True: return
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer(pricing_message(), reply_markup=pricing_keyboard(), parse_mode='MarkdownV2')
 
 async def wallets_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
     if await get_user_info(user_id,'banned') == True: return
     price = callback.data
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer(r'''💸 Pick a *wallet* to continue\.
 💬 Other options available via *Support*\.''', reply_markup=wallets_keyboard(price), parse_mode='MarkdownV2')
 
@@ -151,10 +157,16 @@ async def my_profile_callback(callback: CallbackQuery):
         expiry_date = datetime.strptime(str(expiry_date), "%Y-%m-%d %H:%M:%S.%f")
         days_left = str(expiry_date-datetime.now())
         days_left = days_left[:days_left.find(',')]
-        await callback.message.delete()
+        try:
+            await callback.message.delete()
+        except:
+            pass
         await callback.message.answer(subscirber_profile_message(username, user_id, date, days_left), reply_markup=subscriber_keyboard(), parse_mode='MarkdownV2')
         return
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
     await callback.message.answer(unsubscirber_profile_message(username, user_id), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
 
 async def redeem_keys(message,bot:Bot):
@@ -184,5 +196,9 @@ async def wallet_callback(callback: CallbackQuery):
     price_symbol = callback.data
     amount = price_symbol[:price_symbol.find(':')]
     symbol = price_symbol[price_symbol.find(':')+1:]
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
     await callback.message.answer(get_wallet_message(symbol,float(amount)), reply_markup=subscription_keyboard(), parse_mode='MarkdownV2')
