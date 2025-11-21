@@ -303,7 +303,7 @@ Usage: `{parts[0]} <company_number> <user_number> <user_name> <service_name> <us
                                  parse_mode='MarkdownV2')
             await sleep(randint(8, 20))
             if methode.upper() == 'N':
-                await message.answer(f"✅ *Everything* is Done\!",
+                await message.answer(fr"✅ *Everything* is Done\!",
                                      parse_mode='MarkdownV2')
                 await sleep(1, 2)
                 file_id = 'CQACAgQAAxkDAAIliGkGRF_mGswlQ3rQHKZ2yrdElXzuAALnHgACpOoxUO_yqMXmyY-xNgQ'
@@ -333,3 +333,4 @@ Please make sure all 5 arguments are correct and in order\.
 Use this format:
 `{parts[0]} <victim_number> <spoof_number> <victim_name> <service_name> <otp_digit>`''',
                          parse_mode="MarkdownV2")
+
