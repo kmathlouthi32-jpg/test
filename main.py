@@ -1,6 +1,3 @@
-from utils import keep_alive
-
-keep_alive()
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 import asyncio
@@ -114,5 +111,6 @@ while True:
     except Exception as e:
         print(f"❌ Bot crashed: {e}")
         sleep(3)
+
 
 
