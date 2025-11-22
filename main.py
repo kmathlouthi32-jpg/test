@@ -3,28 +3,11 @@ from aiogram.filters import Command
 import asyncio
 from utils import init_db, create_tables, escape_markdown
 from handlers import *
-import psutil, os
 from time import sleep
 
 bot = Bot(token='7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q')
 dp = Dispatcher()
 
-
-def get_memory_usage():
-    process = psutil.Process(os.getpid())
-    mem = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
-    return round(mem, 2)
-
-
-# Example: log it every few minutes
-async def log_memory():
-    while True:
-        await bot.send_message(
-            -1002942544591,
-            text=
-            f"💾 Memory usage: *{escape_markdown(str(get_memory_usage()))}* MB",
-            parse_mode='MarkdownV2')
-        await asyncio.sleep(300)
 
 
 # START / HELP / UNKNOWN
@@ -101,7 +84,6 @@ async def main():
     print("Bot is running...")
     await init_db()
     await create_tables()
-    asyncio.create_task(log_memory())
     await dp.start_polling(bot)
 
 
@@ -111,6 +93,7 @@ while True:
     except Exception as e:
         print(f"❌ Bot crashed: {e}")
         sleep(3)
+
 
 
 
