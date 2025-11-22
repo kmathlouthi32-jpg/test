@@ -3,8 +3,8 @@ asyncpg
 psycopg
 langcodes[data]
 phonenumbers
-psutil
 language_data
+
 
 
 
