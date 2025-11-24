@@ -101,7 +101,7 @@ async def help_command(message: Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]
     ])
-    await message.answer(r"""*CROWS OTP — Commands Panel*
+    await message.answer(r"""*DRAGON OTP — Commands Panel*
     
 ❓ *Core Commands*
 • `/redeem` — Redeem your access key  
@@ -145,7 +145,7 @@ async def help_callback(callback: CallbackQuery):
         await callback.message.delete()
     except:
         pass
-    await callback.message.answer(r"""*CROWS OTP — Commands Panel*
+    await callback.message.answer(r"""*DRAGON OTP — Commands Panel*
     
 ❓ *Core Commands*
 • `/redeem` — Redeem your access key  
@@ -178,5 +178,6 @@ async def help_callback(callback: CallbackQuery):
 • `/voicelist` — View available voices  
 • `/recall` — Repeat the last victim call
 """, reply_markup=keyboard, parse_mode='MarkdownV2')
+
 
 
