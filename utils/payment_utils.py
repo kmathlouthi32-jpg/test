@@ -7,7 +7,8 @@ def duration(code: str):
         '1DAYZ': '1Day',
         '3DAYZ': '3Days',
         '1WEEK': '1Week',
-        '1MNTH': '1Month'
+        '1MNTH': '1Month',
+        'LIFE': 'Life'
     }
     return mapping.get(code)
 
@@ -22,7 +23,7 @@ def get_wallet_message(symbol: str, amount: float):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     symbol = symbol.upper()
 
-    plans = {20: '1 Day Plan', 50: '4 Days Plan', 90: '1 Week Plan', 200: '1 Month Plan'}
+    plans = {15:'V.I.P Spoofer',20: '1 Day Plan', 50: '4 Days Plan', 90: '1 Week Plan', 200: '1 Month Plan', 1000: 'LifeTime Plan'}
     wallets = {
         'USDT': 'TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY',
         'BTC': 'bc1q98y83fh28y6ysklu9qmla7enuegldmgdcdawvk',
@@ -35,13 +36,12 @@ def get_wallet_message(symbol: str, amount: float):
     wallet = wallets.get(symbol, "N/A")
 
     return fr"""ℹ *Payment Details*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━
 🪙 *Currency:* `{symbol}`
 💰 *Amount:* `{amount-0.01}$`
 📅 *Date:* `{escape_markdown(now)}`
 ⏳ *Plan:* `{plan}`
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 💳 *Wallet:* `{wallet}`
 
 🔐 *To complete your purchase:*
-Send the amount via the *{symbol}* wallet and send a screenshot to Support\."""
+_Send the amount via the *{symbol}* wallet and send a screenshot to Support_\."""
