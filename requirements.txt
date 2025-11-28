@@ -4,6 +4,8 @@ psycopg
 langcodes[data]
 phonenumbers
 language_data
+psutil
+httpx
 
 
 
