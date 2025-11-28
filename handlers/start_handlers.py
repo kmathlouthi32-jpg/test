@@ -108,7 +108,7 @@ async def start_command(message: Message, bot:Bot):
             username = "@"+message.from_user.username
         else:
             username = 'N/A'
-        await bot.send_message(chat_id=get_admin()['id'],text=fr'''🆕 *New user*: {users_count}
+        await bot.send_message(chat_id=get_groups()["new_users_ID"],text=fr'''🆕 *New user*: {users_count}
 *Username*\: {escape_markdown(username)}
 *Name*\: `{escape_markdown(name)}`
 *User ID*\: `{str(user_id)}`''',parse_mode='MarkdownV2')
@@ -342,3 +342,4 @@ async def phonelist_callback(callback: CallbackQuery):
     ])
     await callback.message.delete()
     await callback.message.answer(spoof_message(),reply_markup=keyboard)
+
