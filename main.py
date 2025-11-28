@@ -1,14 +1,11 @@
-import uvloop
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 import asyncio
 import psutil
-from config import get_admin
 import os
 from utils import db, load_all_users
 from handlers import *
+asyncio.set_event_loop(asyncio.new_event_loop())
 
 def get_memory_usage():
     process = psutil.Process(os.getpid())
@@ -107,6 +104,7 @@ async def main():
 
 
 asyncio.run(main())
+
 
 
 
