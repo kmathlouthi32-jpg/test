@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram import types
 from config import get_voices
-from utils import get_user_info, set_user_value,escape_markdown
+from utils import escape_markdown, get_user_cached, update_user_cache
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -42,7 +42,8 @@ def setvoice_keyboard():
 
 async def voicelist_command(message: Message):
     user_id = message.from_user.id
-    if await get_user_info(user_id,'banned'): return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']: return
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back4")]
     ])
@@ -53,20 +54,22 @@ async def voicelist_command(message: Message):
 
 async def setvoice_command(message: Message):
     user_id = message.from_user.id
-    if await get_user_info(user_id,'banned'): return
-    current_voice = await get_user_info(user_id,'voice')
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']: return
+    current_voice = user_data['voice']
     await message.answer(get_setvoice_message(current_voice),reply_markup=setvoice_keyboard(), parse_mode='MarkdownV2')
 
 async def changevoice_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
-    if await get_user_info(user_id,'banned'): return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']: return
     selected_voice = callback.data
-    current_voice = await get_user_info(user_id,'voice')
+    current_voice = user_data['voice']
     await callback.message.delete()
     if current_voice == selected_voice:
         await callback.message.answer("🎧 Voice already in use.")
         return
-    await set_user_value(user_id, 'voice', selected_voice)
+    await update_user_cache(user_id, 'voice',selected_voice)
     await callback.message.answer('✅ Voice updated.')
 
 # --- STATE DEFINITION ---
@@ -77,7 +80,8 @@ class ScriptForm(StatesGroup):
 # --- COMMAND HANDLER ---
 async def setscript_command(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    if await get_user_info(user_id, 'banned'):
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']:
         return
     await message.answer("📝 Please send me your custom script text:")
     await state.set_state(ScriptForm.waiting_for_script)
@@ -89,14 +93,16 @@ async def process_script_text(message: types.Message, state: FSMContext):
     script_text = message.text.strip()
 
     # ✅ Example: Save to your database
-    await set_user_value(user_id, "custom_script", script_text)
+    await update_user_cache(user_id, 'custom_script',script_text)
 
     await message.answer("✅ Your custom script has been saved successfully.")
     await state.clear()  # reset FSM state
 
 async def view_script(message: Message):
     user_id = message.from_user.id
-    script = await get_user_info(user_id,'custom_script')
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']:return
+    script = user_data['custom_script']
     if script!='N/A':
         msg = rf"""*Your current script*:
 {escape_markdown(script)}"""
