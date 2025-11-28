@@ -1,28 +1,26 @@
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from utils import get_user_info, escape_markdown, check_subscription, redeem_key, get_wallet_message
+from utils import escape_markdown, check_subscription, get_wallet_message, db, get_user_cached
 from config import get_admin, get_groups
 from datetime import datetime
 from aiogram import Bot
 
 def subscription_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Plans", callback_data="purchase"),
-         InlineKeyboardButton(text="🆘 Support", url=get_admin()['link'])]
+        [InlineKeyboardButton(text="💳 Confirm payment", url=get_admin()['link'])],
+        [InlineKeyboardButton(text="❌ Cancel", callback_data='back1')],
+        [InlineKeyboardButton(text="💸 Choose Another Plan", callback_data="purchase")]
+        
     ])
 
 def pricing_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="💫 1 Day — $19.99", callback_data="20"),
-            InlineKeyboardButton(text="🔥 4 Days — $49.99", callback_data="50"),
-        ],
-        [
-            InlineKeyboardButton(text="💎 1 Week — $89.99", callback_data="90"),
-            InlineKeyboardButton(text="🚀 1 Month — $199.99", callback_data="200"),
-        ],
-        [
-            InlineKeyboardButton(text="🔙 Back To menu", callback_data="back1")
-        ]
+        [InlineKeyboardButton(text="📱 V.I.P Spoofer — $14.99", callback_data="15")],
+        [InlineKeyboardButton(text="💫 1 Day — $19.99", callback_data="20")],
+        [InlineKeyboardButton(text="🔥 4 Days — $49.99", callback_data="50")],
+        [InlineKeyboardButton(text="💎 1 Week — $89.99", callback_data="90")],
+        [InlineKeyboardButton(text="🚀 1 Month — $199.99", callback_data="200")],
+        [InlineKeyboardButton(text="♾️ LifeTime — $999.99", callback_data="1000")],
+        [InlineKeyboardButton(text="🔙 Back To menu", callback_data="back1")]
     ])
 
 def wallets_keyboard(price):
@@ -51,65 +49,51 @@ def wallets_keyboard(price):
 )
 
 def pricing_message():
-    return r"""💰 Choose your subscription plan
+    return r"""💰 *Choose Your Subscription Package*:
 
-🔹 *1 Day* Access — *$19\.99*
-🔹 *4 Days* Access — *$49\.99*
-🔹 *1 Week* Access — *$89\.99*
-🔹 *1 Month* Access — *$199\.99*
-
-Select the plan that suits you 👇"""
-
-def subscirber_profile_message(username, user_id, date, days_left):
-    return fr"""*🐉 DRAGON OTP — User Dashboard*
-
-👤 *Username*: `{escape_markdown(username)}`
-🆔 *User ID*: `{user_id}`
-
-💠 *Plan*: `Premium`
-🟢 *Status*: `Active`
-
-📅 *Start Date*: `{escape_markdown(date)}`
-🕒 *Days Remaining*: `{escape_markdown(days_left)}`
-
-⚡ *Features*:  
-\- Unlimited OTP Access ✅  
-\- Real\-time Spoofing Controls ⚡  
-\- Priority Support 💬"""
+Pick the package that fits your needs 👇"""
 
 def subscriber_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]
     ])
 
-def unsubscirber_profile_message(username, user_id):
-    return fr"""*🐉 DRAGON OTP — User Dashboard*
-
-👤 *Username*: `{escape_markdown(username)}`
-🆔 *User ID*: `{user_id}`
-
-💠 *Plan*: `Basic`
-🔴 *Status*: `Not Active`
-
-⚡️ *Features \(Upgrade to Unlock\)*:
-\- Limited OTP Access 🚫
-\- Spoof Controls Locked 🔒
-\- Standard Support 🕓"""
-
 def unsubscriber_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔥 Buy Now", callback_data="purchase")],
+        [InlineKeyboardButton(text="💰 Purchase", callback_data="purchase")],
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]
     ])
 
+def prices_message():
+    return r"""💵 *Purchase USA With Spoofing*  💵
+
+📅 *Pricing*:
+ • 1 Day: $25 💲
+ • 4 Days: $60 💲
+ • 1 Week: $120 💲
+ • 1 Month: $300 💲
+ • Lifetime: $1500 💲
+—————————————————————
+💵 *Purchase Plans USA With Spoof \+ Europe With Spoofing* 💵
+
+📅 *Pricing*:
+• 1 Day: $30 💲
+• 4 Days: $80 💲
+• 1 Week: $150 💲
+ • 1 Month: $450 💲
+ • Lifetime: $2000 💲
+—————————————————————"""
+
 async def purchase_command(message):
     user_id = message.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
     await message.answer(pricing_message(), reply_markup=pricing_keyboard(), parse_mode='MarkdownV2')
 
 async def purchase_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
     try:
         await callback.message.delete()
     except:
@@ -118,7 +102,8 @@ async def purchase_callback(callback: CallbackQuery):
 
 async def wallets_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
     price = callback.data
     try:
         await callback.message.delete()
@@ -129,56 +114,28 @@ async def wallets_callback(callback: CallbackQuery):
 
 async def my_profile_command(message):
     user_id = message.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
-    if message.from_user.username:
-        username = message.from_user.username
-    else:
-        username = 'N/A'
-    if check_subscription(await get_user_info(user_id, 'expiry_date')) == True:
-        expiry_date = await get_user_info(user_id, 'expiry_date')
-        date = expiry_date[0:16]
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
+    if check_subscription(user_data['expiry_date']) == True:
+        expiry_date = user_data['expiry_date']
         expiry_date = datetime.strptime(str(expiry_date), "%Y-%m-%d %H:%M:%S.%f")
         days_left = str(expiry_date-datetime.now())
         days_left = days_left[:days_left.find(',')]
-        await message.answer(subscirber_profile_message(username, user_id, date, days_left), reply_markup=subscriber_keyboard(), parse_mode='MarkdownV2')
+        await message.answer(f'🕐 your Subscription Ends Within *{escape_markdown(days_left)}*', reply_markup=subscriber_keyboard(),parse_mode='MarkdownV2')
         return
-    await message.answer(unsubscirber_profile_message(username, user_id), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
-
-async def my_profile_callback(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
-    if callback.message.from_user.username:
-        username = callback.message.from_user.username
-    else:
-        username = 'N/A'
-    if check_subscription(await get_user_info(user_id, 'expiry_date')) == True:
-        expiry_date = await get_user_info(user_id, 'expiry_date')
-        date = expiry_date[0:16]
-        expiry_date = datetime.strptime(str(expiry_date), "%Y-%m-%d %H:%M:%S.%f")
-        days_left = str(expiry_date-datetime.now())
-        days_left = days_left[:days_left.find(',')]
-        try:
-            await callback.message.delete()
-        except:
-            pass
-        await callback.message.answer(subscirber_profile_message(username, user_id, date, days_left), reply_markup=subscriber_keyboard(), parse_mode='MarkdownV2')
-        return
-    try:
-        await callback.message.delete()
-    except:
-        pass
-    await callback.message.answer(unsubscirber_profile_message(username, user_id), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
+    await message.answer('No Subscriptions Found ❌', reply_markup=unsubscriber_keyboard())
 
 async def redeem_keys(message,bot:Bot):
     user_id = message.from_user.id
-    if await get_user_info(user_id, 'banned'): return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned']: return
     parts = message.text.split()
     if len(parts)<2:
         await message.answer("❌ No Activation Key\nUse /redeem <key> to activate your access.")
         return
-    msg = await redeem_key(user_id, parts[1])
+    msg,duration_text = await db.redeem_key(user_id, parts[1], user_data['expiry_date'], user_data['rep'])
     await message.answer(msg)
-    duration_text = msg[2:msg.find('K')-1]
+    if duration_text == None:return
     if message.from_user.username:
         username = "@"+message.from_user.username
     else:
@@ -192,7 +149,8 @@ Key: `{parts[1]}`''',parse_mode='MarkdownV2')
 
 async def wallet_callback(callback: CallbackQuery):
     user_id = callback.from_user.id
-    if await get_user_info(user_id,'banned') == True: return
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
     price_symbol = callback.data
     amount = price_symbol[:price_symbol.find(':')]
     symbol = price_symbol[price_symbol.find(':')+1:]
@@ -202,3 +160,9 @@ async def wallet_callback(callback: CallbackQuery):
         pass
 
     await callback.message.answer(get_wallet_message(symbol,float(amount)), reply_markup=subscription_keyboard(), parse_mode='MarkdownV2')
+
+async def prices_command(message):
+    user_id = message.from_user.id
+    user_data = await get_user_cached(user_id)
+    if user_data['banned'] == True: return
+    await message.answer(prices_message(), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
