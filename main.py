@@ -19,7 +19,7 @@ async def log_memory():
         await asyncio.sleep(300)
 
 bot = Bot(token='7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q')
-dp = Dispatcher()
+dp = Dispatcher(skip_updates=True)
 
 # START / HELP / UNKNOWN
 # COMMAND
@@ -104,6 +104,7 @@ async def main():
 
 
 asyncio.run(main())
+
 
 
 
