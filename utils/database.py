@@ -172,13 +172,13 @@ class DBManager:
                 if rep:
                     return "❌ Rep Calls already unlocked!",None
                 await self.set_user_value(user_id, "rep", True)
-                return "✅ Repport Calls Unlocked!",'Repport Calls'
+                return "✅ Repport Calls Unlocked!",'Repport Calls',None
 
             row = await conn.fetchrow("SELECT key_type, used FROM keys WHERE key=$1", key)
             if not row:
-                return "❌ Invalid key!",None
+                return "❌ Invalid key!",None,None
             if row["used"]:
-                return "❌ Key already used!",None
+                return "❌ Key already used!",None,None
 
             key_type = row["key_type"]
 
@@ -192,15 +192,15 @@ class DBManager:
             base = now if expiry < now else expiry
             new_expiry = base + duration
 
-            await self.set_user_value(user_id, "expiry_date", str(new_expiry))
             await conn.execute("UPDATE keys SET used=TRUE WHERE key=$1", key)
             await self.generate_new_key(conn, key_type)
 
             return f"""✅ Key Redeemed Successfully!
             
 🕐 Plan: {label} plan
-🚀 You can now use Dragon OTP!""",label
+🚀 You can now use Dragon OTP!""",label,new_expiry
 
 DB_URL = "postgresql://postgres.aoddcnsgkkowtbktnske:DragonOTPbot123@aws-1-eu-north-1.pooler.supabase.com:6543/postgres"
 
 db = DBManager(DB_URL)
+
