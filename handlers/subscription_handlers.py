@@ -1,5 +1,5 @@
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
-from utils import escape_markdown, check_subscription, get_wallet_message, db, get_user_cached
+from utils import escape_markdown, check_subscription, get_wallet_message, db, get_user_cached, update_user_cache
 from config import get_admin, get_groups
 from datetime import datetime
 from aiogram import Bot
@@ -167,4 +167,5 @@ async def prices_command(message):
     user_data = await get_user_cached(user_id)
     if user_data['banned'] == True: return
     await message.answer(prices_message(), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
+
 
