@@ -141,7 +141,7 @@ async def redeem_keys(message,bot:Bot):
     else:
         username = 'N/A'
     name = message.from_user.first_name
-    await update_user_cache(user_id, 'expiry_date', expiry)
+    await update_user_cache(user_id, 'expiry_date', str(expiry))
     await bot.send_message(chat_id=get_groups()['redeemed_keys_ID'],text=fr'''*Key For {duration_text}*
 Redeemed by {escape_markdown(username)}
 Name: `{escape_markdown(name)}`
@@ -167,5 +167,6 @@ async def prices_command(message):
     user_data = await get_user_cached(user_id)
     if user_data['banned'] == True: return
     await message.answer(prices_message(), reply_markup=unsubscriber_keyboard(), parse_mode='MarkdownV2')
+
 
 
