@@ -1,5 +1,47 @@
 from datetime import datetime
 from .text_utils import escape_markdown
+import httpx
+
+COINS = {
+    "btc": "bitcoin",
+    "eth": "ethereum",
+    "ltc": "litecoin",
+    "sol": "solana",
+    "usdt": "tether"
+}
+
+def get_price(symbol):
+    symbol = symbol.lower()
+    if symbol not in COINS:
+        raise ValueError(f"Unsupported coin: {symbol}")
+
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    params = {
+        "ids": COINS[symbol],
+        "vs_currencies": "usd"
+    }
+
+    r = httpx.get(url, params=params)
+
+    # validate response
+    if r.status_code != 200:
+        raise Exception(f"API error: {r.status_code} | {r.text}")
+
+    data = r.json()
+
+    # check if coin exists in response
+    if COINS[symbol] not in data:
+        raise Exception(f"CoinGecko returned no data: {data}")
+
+    return data[COINS[symbol]]["usd"]
+
+
+def usd_to_crypto(symbol, usd_amount):
+    price = get_price(symbol)
+    price = str(usd_amount/price)
+    return f"{usd_amount}$ = {price[:10]} {symbol.upper()}"
+
+
 
 def duration(code: str):
     mapping = {
@@ -37,10 +79,10 @@ def get_wallet_message(symbol: str, amount: float):
 
     return fr"""ℹ *Payment Details*
 ━━━━━━━━━━━━━━━
-🪙 *Currency:* `{symbol}`
-💰 *Amount:* `{amount-0.01}$`
-📅 *Date:* `{escape_markdown(now)}`
-⏳ *Plan:* `{plan}`
+🪙 *Currency:* {symbol}
+💰 *Amount:* {escape_markdown(usd_to_crypto(symbol, amount))}
+📅 *Date:* {escape_markdown(now)}
+⏳ *Plan:* {escape_markdown(plan)}
 💳 *Wallet:* `{wallet}`
 
 🔐 *To complete your purchase:*
