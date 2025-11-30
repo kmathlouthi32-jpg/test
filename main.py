@@ -5,6 +5,7 @@ import psutil
 import os
 from utils import db, load_all_users
 from handlers import *
+from time import sleep
 asyncio.set_event_loop(asyncio.new_event_loop())
 
 def get_memory_usage():
@@ -102,8 +103,13 @@ async def main():
     asyncio.create_task(log_memory())
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
+while True:
+    try:
+        asyncio.run(main())
+    except:
+        print('Restart in 10 s')
+        sleep(5)
 
-asyncio.run(main())
 
 
 
