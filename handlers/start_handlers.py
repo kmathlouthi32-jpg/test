@@ -4,7 +4,7 @@ from utils import escape_markdown, check_subscription, get_user_cached, is_new_u
 from config import get_admin, get_groups, get_video, spoof_message
 
 def start_message(name):
-    return fr"""👋 *Welcome {name} to DRAGON OTP BOT \- Ultimate Spoofing Experience* 🐉
+    return fr"""👋 *Welcome {escape_markdown(name)} to DRAGON OTP BOT \- Ultimate Spoofing Experience* 🐉
 
 *DRAGON OTP* is the \#1 Telegram\-based OTP spoofing system built for professionals\.
 
@@ -13,7 +13,7 @@ It combines cutting\-edge AI, global voice routing, and real\-time control to de
 Whether you're testing, analyzing, or automating — DRAGON OTP gives you the tools to dominate with speed, stealth, and precision\."""
 
 def admin_start_message(name):
-    return fr"""🔥 Welcome back, {name}\!
+    return fr"""🔥 Welcome back, {escape_markdown(name)}\!
 
 👑 You’re logged in as the Owner of *DRAGON OTP BOT*\.  
 Manage users, keys, and sales — your control center awaits ⚙️
@@ -342,4 +342,5 @@ async def phonelist_callback(callback: CallbackQuery):
     ])
     await callback.message.delete()
     await callback.message.answer(spoof_message(),reply_markup=keyboard)
+
 
