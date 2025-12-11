@@ -71,7 +71,7 @@ async def call_proccess(message, parts, user_id):
 🔰  *New spoofed call started*
 ╚════════════════╝
 
-👤 *Target Name*: {victim_name}
+👤 *Target Name*: {escape_markdown(victim_name)}
 📲 *Target Number*: \{victim_number}
 🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
 🎭 *From*: \{spoof_number}
@@ -85,7 +85,7 @@ async def call_proccess(message, parts, user_id):
 🔰  *New spoofed call started*
 ╚════════════════╝
 
-👤 *Target Name*: {victim_name}
+👤 *Target Name*: {escape_markdown(victim_name)}
 📲 *Target Number*: \{victim_number}
 🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
 🎭 *From*: \{spoof_number}
@@ -100,7 +100,7 @@ async def call_proccess(message, parts, user_id):
 🔰  *New spoofed call started*
 ╚════════════════╝
 
-👤 *Target Name*: {victim_name}
+👤 *Target Name*: {escape_markdown(victim_name)}
 📲 *Target Number*: \{victim_number}
 🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
 🎭 *From*: \{spoof_number}
@@ -188,7 +188,7 @@ async def precall_proccess(message, parts, user_id):
 🔰  *New spoofed call started*
 ╚════════════════╝
 
-👤 *Target Name*: {victim_name}
+👤 *Target Name*: {escape_markdown(victim_name)}
 📲 *Target Number*: \{victim_number}
 🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
 🎭 *From*: \{spoof_number}
@@ -338,7 +338,7 @@ Please upgrade or purchase the required option to continue\.""",
 🔰  *New spoofed call started*
 ╚════════════════╝
 
-👤 *Target Name*: {service_name}
+👤 *Target Name*: {escape_markdown(service_name)}
 📲 *Target Number*: \{user_number}
 🌎 *Location*: {escape_markdown(get_region_language(user_number))}
 🎭 *From*: \{user_number}
@@ -397,5 +397,6 @@ Please upgrade or purchase the required option to continue\.""",
                              parse_mode="MarkdownV2")
         return
     await message.answer(fr"❌ Oops... Something went wrong!")
+
 
 
