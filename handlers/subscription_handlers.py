@@ -4,14 +4,6 @@ from config import get_admin, get_groups
 from datetime import datetime
 from aiogram import Bot
 
-def subscription_keyboard():
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Confirm payment", url=get_admin()['link'])],
-        [InlineKeyboardButton(text="❌ Cancel", callback_data='back1')],
-        [InlineKeyboardButton(text="💸 Choose Another Plan", callback_data="purchase")]
-        
-    ])
-
 def pricing_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📱 V.I.P Spoofer — $14.99", callback_data="15")],
@@ -160,7 +152,7 @@ async def wallet_callback(callback: CallbackQuery):
     except:
         pass
 
-    await callback.message.answer(get_wallet_message(symbol,float(amount)), reply_markup=subscription_keyboard(), parse_mode='MarkdownV2')
+    await callback.message.answer(get_wallet_message(symbol,float(amount),user_data['wallet']), parse_mode='MarkdownV2',disable_web_page_preview=True)
 
 async def prices_command(message):
     user_id = message.from_user.id
