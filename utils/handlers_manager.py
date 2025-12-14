@@ -23,7 +23,8 @@ async def load_all_users():
                 "last_call": row["last_call"],
                 "voice": row["voice"],
                 "custom_script": row["custom_script"],
-                "rep": row["rep"]
+                "rep": row["rep"],
+                "wallet":row['wallet']
             }
     CACHE_LOADED = True
     print(f"✅ Loaded {len(USER_CACHE)} users into memory cache.")
@@ -56,7 +57,9 @@ async def get_user_cached(user_id: int):
         "last_call": "N/A",
         "voice": "Michael",
         "custom_script": "N/A",
-        "rep": False
+        "rep": False,
+        'wallet':0
+
     }
     return USER_CACHE[user_id]
 
