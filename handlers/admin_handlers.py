@@ -1,6 +1,6 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import get_admin, get_groups
-from utils import db, update_user_cache
+from utils import db, update_user_cache, get_user_cached
 from aiogram import Bot
 
 def keys_type():
@@ -44,6 +44,18 @@ async def unban_command(message: Message,bot:Bot):
         await bot.unban_chat_member(MAIN_CHANNELS[1], int(parts[1]))
     except Exception as e:
         message.answer(f"Failed to ubban {int(parts[1])} in the vouches channel: {e}")
+
+async def switch_command(message: Message):
+    if message.from_user.id != get_admin()['id']: return
+    parts = message.text.split()
+    if len(parts)<2: return
+    user_data = await get_user_cached(int(parts[1]))
+    if user_data['wallet'] == 0:
+        await update_user_cache(int(parts[1]),'wallet', 1)
+        await message.answer(f"User {parts[1]} wallets switched✅")
+        return
+    await update_user_cache(int(parts[1]),'wallet', 0)
+    await message.answer(f"User {parts[1]} wallets switched✅")
 
 async def keys_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
