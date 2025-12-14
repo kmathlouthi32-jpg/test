@@ -17,7 +17,7 @@ class DBManager:
     }
     ALLOWED_COLUMNS = {
     "user_id", "banned", "expiry_date", "last_call", "voice",
-    "custom_script", "rep"
+    "custom_script", "rep",'wallet'
     }
 
     def __init__(self, db_url: str):
@@ -70,7 +70,8 @@ class DBManager:
                     last_call TEXT DEFAULT 'N/A',
                     voice TEXT DEFAULT 'Michael',
                     custom_script TEXT DEFAULT 'N/A',
-                    rep BOOLEAN DEFAULT FALSE
+                    rep BOOLEAN DEFAULT FALSE,
+                    wallet INT DEFAULT 0
                 );
             """)
             await conn.execute("""
