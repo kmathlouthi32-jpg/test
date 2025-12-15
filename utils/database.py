@@ -71,7 +71,7 @@ class DBManager:
                     voice TEXT DEFAULT 'Michael',
                     custom_script TEXT DEFAULT 'N/A',
                     rep BOOLEAN DEFAULT FALSE,
-                    wallet INT DEFAULT 0
+                    wallet INT DEFAULT 1
                 );
             """)
             await conn.execute("""
@@ -204,4 +204,5 @@ class DBManager:
 DB_URL = "postgresql://postgres.aoddcnsgkkowtbktnske:DragonOTPbot123@aws-1-eu-north-1.pooler.supabase.com:6543/postgres"
 
 db = DBManager(DB_URL)
+
 
