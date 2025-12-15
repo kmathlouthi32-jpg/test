@@ -69,7 +69,7 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int):
     plans = {15:'V.I.P Spoofer',20: '1 Day Plan', 50: '4 Days Plan', 90: '1 Week Plan', 200: '1 Month Plan', 1000: 'LifeTime Plan'}
     wallets = [{
         'USDT': 'TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY',
-        'BTC': 'bc1q98y83fh28y6ysklu9qmla7enuegldmgdcdawvk',
+        'BTC': '12g9D3pdhse6HSS38LYJr9bwXUGkeRbVHd',
         'ETH': '0xc76acc06684b2e2a2d43b9ba3b5f2618cd7a6307',
         'SOL': '8Ra9HKVrKNakEeQfqDzrVn1sFoQoFmbR51UHMRweT9hY',
         'LTC': 'LRJ8n55djedy4jyKP3Kkqi6iEy3BYC1FLt'
@@ -96,3 +96,4 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int):
 
 🔐 *To complete your purchase:*
 _Send the amount via the *{symbol}* wallet and send a screenshot to *[Support]({get_admin()['link']})*_\."""
+
