@@ -72,3 +72,6 @@ async def update_user_cache(user_id: int, field: str, value):
 
     USER_CACHE[user_id][field] = value
     await db.set_user_value(user_id, field, value)
+
+async def get_all_users():
+    return [user_id for user_id, data in USER_CACHE.items() if not data.get("banned", False)]
