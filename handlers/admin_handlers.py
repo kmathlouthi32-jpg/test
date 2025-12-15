@@ -91,3 +91,50 @@ async def generate_keys_command(message: Message):
     await message.answer("⏳ Generating keys...")
     await message.answer(await db.generate_bulk_keys())
 
+async def send_all(message: types.Message, bot: Bot):
+    admin_id = get_admin().get('id')
+    if message.from_user.id != admin_id:
+        return
+
+    # Get the text after the command
+    parts = message.text.split(maxsplit=1)
+    if len(parts) < 2:
+        await message.reply("❌ Please provide a message to send.")
+        return
+
+    msg_to_send = parts[1]  # Keep multi-line text
+
+    # Get all non-banned users
+    user_ids = await get_all_users()  # must be async
+
+    sent = 0
+    failed = 0
+    try:
+        await message.answer(msg_to_send, parse_mode='MarkdownV2')
+        for user_id in user_ids:
+            if user_id != get_admin()['id']:
+                try:
+                    await bot.send_message(user_id, msg_to_send, parse_mode='MarkdownV2')
+                    sent += 1
+                    await asyncio.sleep(0.05)  # Respect Telegram rate limits (~20 msg/sec)
+
+                except TelegramRetryAfter as e:
+                    print(str(e))
+                    await asyncio.sleep(e.timeout)
+
+                except TelegramAPIError as e:
+                    error_text = str(e)
+                    if "bot was blocked by the user" in error_text:
+                        await message.answer(f"❌ User {user_id} blocked the bot. Skipping.")
+                    elif "chat not found" in error_text:
+                        await message.answer(f"❌ User {user_id} account deleted. ban.")
+                        await update_user_cache(user_id, 'banned',True)
+                    failed += 1
+
+    except Exception as e:
+        await message.answer(f"❌ Message entity problem.")
+        failed += 1
+        return
+
+    await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
