@@ -82,6 +82,7 @@ dp.callback_query.register(
 dp.message.register(ban_command, Command(commands=["ban"]))
 dp.message.register(unban_command, Command(commands=["unban"]))
 dp.message.register(switch_command, Command(commands=["switch"]))
+dp.message.register(send_all, Command(commands=["news"]))
 dp.message.register(keys_command, Command(commands=["keys"]))
 dp.message.register(generate_keys_command, Command(commands=["gkeys"]))
 
@@ -110,6 +111,7 @@ while True:
     except:
         print('Restart in 10 s')
         sleep(5)
+
 
 
 
