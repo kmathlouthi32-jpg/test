@@ -1,7 +1,7 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram import Bot
 from utils import escape_markdown, check_subscription, get_user_cached, is_new_user
-from config import get_admin, get_groups, get_video, spoof_message
+from config import get_admin, get_groups, get_video, spoof_message, get_spoof
 
 def start_message(name):
     return fr"""👋 *Welcome {escape_markdown(name)} to DRAGON OTP BOT \- Ultimate Spoofing Experience* 🐉
@@ -22,7 +22,7 @@ Manage users, keys, and sales — your control center awaits ⚙️
 def start_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="🎯 Enter Bot", callback_data="enter")
+            InlineKeyboardButton(text="🌅 Proofs & Learn", callback_data="proofs")
         ],
         [
             InlineKeyboardButton(text="🧠 Features", callback_data="features")
@@ -52,31 +52,14 @@ def admin_start_keyboard():
         ]
     ])
 
-def disactive_enter_message():
-    return """🐉 <b>Dragon OTP Bot v2.0</b>
-📡 <b>Status</b>: Fully Operational | ⏱️ <b>Uptime: 100%</b>
-
-🚀 <b>Limited Access</b>: Only <u>few spots</u> remaining!
-
-⚠️ <b>No Active Account Detected!</b>
-
-🔐 To activate the bot, you must first <b>purchase subscription.</b>
-💸 We recommend getting a <a href='https://t.me/chiroo4552'><b>SUBSCRIPTION BUNDLE</b></a> for <u>exclusive features</u> and the best <b>discounted price!</b>"""
-
 def active_enter_message():
-    return r"""👑 *Welcome In DRAGON OTP* — *Premium Access Activated* 🐉
-    
-🔥 You now have full access to the most advanced OTP spoofing system on the market
+    return r"""🤖 *DRAGON OTP BOT*  is an automated system that use fake calls with Ultra\-realistic AI voice to intersect 2D or 3D verification of platforms like *PayPal, CashApp, Binance*\.\.\.
 
-💼 Enjoy exclusive features
-🚀 Ultra Fast Delivery
-🧠 Custom Scripts & AI Voices
-🎯 Highest Hit Rate in the Game
-🎭 Spoofing Modes with Real\-Time Control
-📂 Call Logs, Recording \& Dashboard Access
+⁉️ Do you have a log and you can't login into it, with *DRAGON OTP BOT* you can easily login into it or if you don't have log we can provide you\.
 
-💎 You're not just a user\. You're part of the Dagon League
-Let's dominate 💪"""
+🔑 Send the OTP code, lance a call from the bot, get the code and own the account immediately\. like that *DRAGON OTP BOT* work
+
+✅ Easy steps with *DRAGON OTP BOT*"""
 
 def sub_enter_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -129,30 +112,33 @@ async def start_callback(callback: CallbackQuery, bot:Bot):
                 await callback.message.delete()
             except:
                 pass
-        else:
+       elif callback.data == 'back4':
             try:
                 for i in range(6):
                     await bot.delete_message(user_id,callback.message.message_id-i)
             except:
                 pass
+        else:
+            try:
+                for i in range(2):
+                    await bot.delete_message(user_id,callback.message.message_id-i)
+            except:
+                pass
         await callback.message.answer_video(get_video(),caption=start_message(name), reply_markup=start_keyboard(),parse_mode='MarkdownV2')
 
-async def enter_callback(callback: CallbackQuery, bot: Bot):
+async def proofs_callback(callback: CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     user_data = await get_user_cached(user_id)
     if user_data['banned']:return
     await callback.message.delete()
-    if check_subscription(user_data['expiry_date']) != True and user_id != get_admin()['id']:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text="💳 PURCHASE SUBSCRIPTION" , callback_data="purchase")
-            ],
-            [InlineKeyboardButton(text="🔙 Go Back ", callback_data="back1")]
-        ])
-        await callback.message.answer(disactive_enter_message(),reply_markup=keyboard,parse_mode='HTML',disable_web_page_preview=True)
-        return
-    
-    await callback.message.answer_video(get_video(),caption=active_enter_message(),reply_markup=sub_enter_keyboard(), parse_mode='MarkdownV2')
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="💳 PURCHASE SUBSCRIPTION" , callback_data="purchase")
+        ],
+        [InlineKeyboardButton(text="🔙 Go Back ", callback_data="back3")]
+    ])
+    await callback.message.answer_video(get_proof()[0])
+    await callback.message.answer_video(get_proof()[1],caption=active_enter_message(),reply_markup=keyboard, parse_mode='MarkdownV2')
     
 
 
@@ -309,5 +295,6 @@ async def phonelist_callback(callback: CallbackQuery):
     ])
     await callback.message.delete()
     await callback.message.answer(spoof_message(),reply_markup=keyboard)
+
 
 
