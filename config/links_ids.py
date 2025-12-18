@@ -2,7 +2,7 @@ def get_groups():
     new_users_ID = -1002515925429
     redeemed_keys_ID = -1002562333792
     vouches_LINK, vouches_ID = 'https://t.me/+YmPZwIxpanA5NTRk', -1002609367196
-    main_channel_link, main_channel_ID = 'https://t.me/DRAGON_OTP_channel', -1002269511043
+    main_channel_link, main_channel_ID = 'https://t.me/+wahQH7oAXTU2ZGVk', -1002269511043
 
     return {
         "new_users_ID": new_users_ID,
@@ -12,3 +12,4 @@ def get_groups():
         "main_channel_link": main_channel_link,
         "main_channel_ID": main_channel_ID,
     }
+
