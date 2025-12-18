@@ -141,22 +141,7 @@ async def enter_callback(callback: CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     user_data = await get_user_cached(user_id)
     if user_data['banned']:return
-    member1 = await bot.get_chat_member(get_groups()['main_channel_ID'], user_id)
-    member2 = await bot.get_chat_member(get_groups()['vouches_ID'], user_id)
     await callback.message.delete()
-    if not (member1.status in ["member", "administrator", "creator"] and member2.status in ["member", "administrator", "creator"]):
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text="📂 Add 'DRAGON 🐉' Folder" , url="https://t.me/addlist/WAoy34BFHyFlZTFk")
-            ],
-            [InlineKeyboardButton(text="✅ I've Subscribed", callback_data="subscribed")]
-        ])
-        await callback.message.answer(r'''⚠️ *You are not subscribed to our channels*
-
-To use the bot, please subscribe to the required channels and group\.
-
-👇 Click the button below to add them all in one folder and join easily:''',parse_mode='MarkdownV2',reply_markup=keyboard)
-        return
     if check_subscription(user_data['expiry_date']) != True and user_id != get_admin()['id']:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [
@@ -169,25 +154,7 @@ To use the bot, please subscribe to the required channels and group\.
     
     await callback.message.answer_video(get_video(),caption=active_enter_message(),reply_markup=sub_enter_keyboard(), parse_mode='MarkdownV2')
     
-async def subsribed_callback(callback: CallbackQuery, bot: Bot):
-    user_id = callback.from_user.id
-    user_data = await get_user_cached(user_id)
-    if user_data['banned']:return
-    member1 = await bot.get_chat_member(get_groups()['main_channel_ID'], user_id)
-    member2 = await bot.get_chat_member(get_groups()['vouches_ID'], user_id)
-    await callback.message.delete()
-    if member1.status in ["member", "administrator", "creator"] and member2.status in ["member", "administrator", "creator"]:
-        name = callback.from_user.first_name
-        await callback.message.answer_video(get_video(),caption=start_message(name), reply_markup=start_keyboard(),parse_mode='MarkdownV2')
-        return
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔄 Retry", callback_data="subscribed")],
-        [InlineKeyboardButton(text="📂 Please Join to Channles" , url="https://t.me/addlist/WAoy34BFHyFlZTFk")]
-            
-        ])
-    await callback.message.answer("""❌ You're still not subscribed!
 
-Please join the required channels then click Retry.""",reply_markup=keyboard)
 
 async def help_command(message: Message):
     user_id = message.from_user.id
