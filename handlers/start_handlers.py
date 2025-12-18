@@ -1,7 +1,7 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from aiogram import Bot
 from utils import escape_markdown, check_subscription, get_user_cached, is_new_user
-from config import get_admin, get_groups, get_video, spoof_message, get_spoof
+from config import get_admin, get_groups, get_video, spoof_message, get_proof
 
 def start_message(name):
     return fr"""👋 *Welcome {escape_markdown(name)} to DRAGON OTP BOT \- Ultimate Spoofing Experience* 🐉
@@ -295,6 +295,7 @@ async def phonelist_callback(callback: CallbackQuery):
     ])
     await callback.message.delete()
     await callback.message.answer(spoof_message(),reply_markup=keyboard)
+
 
 
 
