@@ -76,10 +76,10 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int):
     },
     {
         'USDT': 'TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf',
-        'BTC': '1M6Q4pFzofeBvA9e2CQ9rhtLyLkLc34p3q',
-        'ETH': '0x1c89c55def70cb0fccaf058abfc5a1e493d0e297',
-        'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
-        'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
+        'BTC': '1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC',
+        'ETH': '0x91ab56856eff7bc410fdac41c35a75d4e83410f6',
+        'SOL': 'GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts',
+        'LTC': 'LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm'
     }
     ]
 
@@ -96,5 +96,6 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int):
 
 🔐 *To complete your purchase:*
 _Send the amount via the *{symbol}* wallet and send a screenshot to *[Support]({get_admin()['link']})*_\."""
+
 
 
