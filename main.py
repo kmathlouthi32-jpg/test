@@ -29,7 +29,7 @@ dp.message.register(start_command, Command(commands=["start"]))
 
 # CALLBACK
 dp.callback_query.register(help_callback, lambda c: c.data == "help")
-dp.callback_query.register(enter_callback, lambda c: c.data == "enter")
+dp.callback_query.register(proofs_callback, lambda c: c.data == "proofs")
 dp.callback_query.register(features_callback, lambda c: c.data == "features")
 dp.callback_query.register(call_commands_callback, lambda c: c.data == "call_commands")
 dp.callback_query.register(phonelist_callback, lambda c: c.data == "phonelist")
@@ -110,6 +110,7 @@ while True:
     except:
         print('Restart in 10 s')
         sleep(5)
+
 
 
 
