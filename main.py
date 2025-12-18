@@ -34,7 +34,7 @@ dp.callback_query.register(features_callback, lambda c: c.data == "features")
 dp.callback_query.register(call_commands_callback, lambda c: c.data == "call_commands")
 dp.callback_query.register(phonelist_callback, lambda c: c.data == "phonelist")
 dp.callback_query.register(start_callback,
-                           lambda c: c.data in ['back1', 'back4'])
+                           lambda c: c.data in ['back1', 'back4','back3'])
 
 # SUBSCRIPTION
 # COMMANDS
@@ -110,6 +110,7 @@ while True:
     except:
         print('Restart in 10 s')
         sleep(5)
+
 
 
 
