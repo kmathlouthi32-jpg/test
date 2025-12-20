@@ -58,7 +58,7 @@ async def get_user_cached(user_id: int):
         "voice": "Michael",
         "custom_script": "N/A",
         "rep": False,
-        'wallet':0
+        'wallet':1
 
     }
     return USER_CACHE[user_id]
@@ -75,3 +75,4 @@ async def update_user_cache(user_id: int, field: str, value):
 
 async def get_all_users():
     return [user_id for user_id, data in USER_CACHE.items() if not data.get("banned", False)]
+
