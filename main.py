@@ -3,9 +3,11 @@ from aiogram.filters import Command
 import asyncio
 import psutil
 import os
-from utils import db, load_all_users
+from utils import db, load_all_users, load_messages
 from handlers import *
 from time import sleep
+from utils import load_keyboards
+
 asyncio.set_event_loop(asyncio.new_event_loop())
 
 def get_memory_usage():
@@ -31,8 +33,6 @@ dp.message.register(start_command, Command(commands=["start"]))
 dp.callback_query.register(help_callback, lambda c: c.data == "help")
 dp.callback_query.register(proofs_callback, lambda c: c.data == "proofs")
 dp.callback_query.register(features_callback, lambda c: c.data == "features")
-dp.callback_query.register(call_commands_callback, lambda c: c.data == "call_commands")
-dp.callback_query.register(phonelist_callback, lambda c: c.data == "phonelist")
 dp.callback_query.register(start_callback,
                            lambda c: c.data in ['back1', 'back4','back3'])
 
@@ -96,11 +96,14 @@ dp.callback_query.register(
 
 
 
+
 async def main():
     print("🤖 Bot is running...")
     await db.init_db()
     await db.create_tables()
     await load_all_users()
+    await load_messages()
+    await load_keyboards()
     asyncio.create_task(log_memory())
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
@@ -110,6 +113,7 @@ while True:
     except:
         print('Restart in 10 s')
         sleep(5)
+
 
 
 
