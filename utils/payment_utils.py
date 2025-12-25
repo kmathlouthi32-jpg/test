@@ -1,5 +1,4 @@
 from datetime import datetime
-from .text_utils import escape_markdown
 import httpx
 from config import get_admin
 from .messages_manager import render_message
