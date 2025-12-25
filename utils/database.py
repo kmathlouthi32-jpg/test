@@ -81,6 +81,23 @@ class DBManager:
                     key_type TEXT
                 );
             """)
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS messages (
+                    key TEXT NOT NULL,
+                    lang TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    PRIMARY KEY (key, lang)
+                );
+            """)
+
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS keyboards (
+                    key TEXT NOT NULL,
+                    lang TEXT NOT NULL,
+                    buttons JSONB NOT NULL,
+                    PRIMARY KEY (key, lang)
+                );
+            """)
 
     # -----------------------------
     # USER OPERATIONS
@@ -171,15 +188,15 @@ class DBManager:
             # Special rep key
             if key == "DragonOTP-93J9YHKT8DKMXJC9YCRY":
                 if rep:
-                    return "❌ Rep Calls already unlocked!",None
+                    return 'norep',None
                 await self.set_user_value(user_id, "rep", True)
-                return "✅ Repport Calls Unlocked!",'Repport Calls',None
+                return 'Repport Calls',None
 
             row = await conn.fetchrow("SELECT key_type, used FROM keys WHERE key=$1", key)
             if not row:
-                return "❌ Invalid key!",None,None
+                return 'wrong_key',None
             if row["used"]:
-                return "❌ Key already used!",None,None
+                return 'used_key',None
 
             key_type = row["key_type"]
 
@@ -196,13 +213,78 @@ class DBManager:
             await conn.execute("UPDATE keys SET used=TRUE WHERE key=$1", key)
             await self.generate_new_key(conn, key_type)
 
-            return f"""✅ Key Redeemed Successfully!
-            
-🕐 Plan: {label} plan
-🚀 You can now use Dragon OTP!""",label,new_expiry
+            return label,new_expiry
+        
+    async def set_message(self, key: str, lang: str, content: str):
+        await self.init_db()
+        async with self.pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO messages (key, lang, content)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (key, lang)
+                DO UPDATE SET content = EXCLUDED.content
+                """,
+                key, lang, content
+            )
+    
+    async def get_message(self, key: str, lang: str):
+        await self.init_db()
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(
+                "SELECT content FROM messages WHERE key=$1 AND lang=$2",
+                key, lang
+            )
+            return row["content"] if row else None
+        
+    async def load_all_messages(self):
+        await self.init_db()
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch("SELECT key, lang, content FROM messages")
+
+        cache = {}
+        for r in rows:
+            cache.setdefault(r["key"], {})[r["lang"]] = r["content"]
+
+        return cache
+    
+    # -----------------------------
+    # KEYBOARDS
+    # -----------------------------
+    async def set_keyboard(self, key: str, lang: str, layout: dict):
+        await self.init_db()
+        async with self.pool.acquire() as conn:
+            await conn.execute(
+                """
+                INSERT INTO keyboards (key, lang, buttons)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (key, lang)
+                DO UPDATE SET buttons = EXCLUDED.buttons
+                """,
+                key, lang, layout
+            )
+
+    async def get_keyboard(self, key: str, lang: str):
+        row = await self.pool.fetchrow(
+            "SELECT layout FROM keyboards WHERE key=$1 AND lang=$2",
+            key, lang
+        )
+        return row["layout"] if row else None
+    
+    async def load_all_keyboards(self):
+        await self.init_db()
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch("SELECT key, lang, buttons FROM keyboards")
+
+        cache = {}
+        for r in rows:
+            cache.setdefault(r["key"], {})[r["lang"]] = r["buttons"]
+
+        return cache
+
 
 DB_URL = "postgresql://postgres.aoddcnsgkkowtbktnske:DragonOTPbot123@aws-1-eu-north-1.pooler.supabase.com:6543/postgres"
 
-db = DBManager(DB_URL)
 
+db = DBManager(DB_URL)
 
