@@ -2,10 +2,11 @@ import random
 from random import randint
 import ast
 import asyncio
+from aiogram import Bot
 from aiogram.types import Message, CallbackQuery
-from utils import get_user_cached, update_user_cache,db, get_spoofer_number, check_subscription, is_valid_phone_number, is_name_valid, check_spoof, escape_markdown, get_region_language, get_service_name
+from utils import get_keyboard, get_message,render_message, get_user_cached, update_user_cache, get_spoofer_number, check_subscription, is_valid_phone_number, is_name_valid, check_spoof, escape_markdown, get_region_language
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from config import get_spoofing, spoof_message, get_admin, get_error, get_spoofing_services
+from config import get_spoofing, get_admin, get_error, get_spoofing_services
 
 def ringing_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -38,22 +39,23 @@ def ringing_keyboard():
             InlineKeyboardButton(text="📨 Push Notification", callback_data="acp")]
     ])
 
-def unsubscriber_keyboard():
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💰 Purchase", callback_data="purchase")],
-        [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]
-    ])
-
-async def call_proccess(message, parts, user_id):
-    user_data = await get_user_cached(user_id)
+async def call_proccess(message, parts, user_id, bot):
+    user_data = get_user_cached(user_id)
     if user_data['banned']: return
+    lang = message.from_user.language_code or "en"
+    lang = lang.split("-")[0]
     if check_subscription(user_data['expiry_date']) != True and user_id != get_admin()['id']:
-        await message.answer('No Subscriptions Found ❌', reply_markup=unsubscriber_keyboard())
+        keyboard = get_keyboard('subback_keyboard',lang,back='back1')
+        text = get_message('noplan_message',lang)
+        await message.answer(text, reply_markup=keyboard)
         return
     if len(parts) < 6:
-        await message.answer(fr"""❌ Invalid command format\.
-`{parts[0]} 15087144578 18888888888 Paypal John 6`""",
-                             parse_mode="MarkdownV2")
+        text = render_message('callerror_message',lang,command=parts[0])
+        try:
+            await message.answer(text,parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(text)
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the call error message\n{e}')
         return
     victim_number, spoof_number, service_name, victim_name, otp_digit = (
         parts[1], parts[2], parts[3], parts[4], parts[5])
@@ -67,50 +69,26 @@ async def call_proccess(message, parts, user_id):
                 InlineKeyboardButton(text="End Call", callback_data="end_call")
             ]])
         if parts[0] == '/call':
-            await message.answer(fr"""╔═══ 📞 *CALL INITIATED* ═══╗
-🔰  *New spoofed call started*
-╚════════════════╝
-
-👤 *Target Name*: {escape_markdown(victim_name)}
-📲 *Target Number*: \{victim_number}
-🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
-🎭 *From*: \{spoof_number}
-🎟 *Service*: {service_name}
-🔢 *OTP Digits Expected*: {otp_digit}
-
-━━━━━━━━━━━━━━━
-📡 *Status*: 🟢 *Active*""",reply_markup=keyboard,parse_mode='MarkdownV2')
+            text = render_message('call_message',lang,victim_name=victim_name,victim_number=victim_number,location=get_region_language(victim_number),spoof_number=spoof_number,service_name=service_name,otp_digit=otp_digit)
+            try:
+                await message.answer(text,reply_markup=keyboard,parse_mode='MarkdownV2')
+            except Exception as e:
+                await message.answer(text,reply_markup=keyboard)
+                await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the call message\n{e}')
         if parts[0] == '/customcall':
-            await message.answer(fr"""╔═══ 📞 *CALL INITIATED* ═══╗
-🔰  *New spoofed call started*
-╚════════════════╝
-
-👤 *Target Name*: {escape_markdown(victim_name)}
-📲 *Target Number*: \{victim_number}
-🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
-🎭 *From*: \{spoof_number}
-🎟 *Service*: {service_name}
-📜 *Custom Script*: On 
-🔢 *OTP Digits Expected*: {otp_digit}
-
-━━━━━━━━━━━━━━━
-📡 *Status*: 🟢 *Active*""",reply_markup=keyboard,parse_mode='MarkdownV2')
+            text = render_message('customcall_message',lang,victim_name=victim_name,victim_number=victim_number,location=get_region_language(victim_number),spoof_number=spoof_number,service_name=service_name,otp_digit=otp_digit)
+            try:
+                await message.answer(text,reply_markup=keyboard,parse_mode='MarkdownV2')
+            except Exception as e:
+                await message.answer(text,reply_markup=keyboard)
+                await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the customcall message\n{e}')
         if parts[0] == '/customvoice':
-            await message.answer(fr"""╔═══ 📞 *CALL INITIATED* ═══╗
-🔰  *New spoofed call started*
-╚════════════════╝
-
-👤 *Target Name*: {escape_markdown(victim_name)}
-📲 *Target Number*: \{victim_number}
-🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
-🎭 *From*: \{spoof_number}
-🎟 *Service*: {service_name}
-📜 *Custom Script*: On 
-🗣 *Voice*: {user_data['voice']}
-🔢 *OTP Digits Expected*: {otp_digit}
-
-━━━━━━━━━━━━━━━
-📡 *Status*: 🟢 *Active*""",reply_markup=keyboard,parse_mode='MarkdownV2')
+            text = render_message('customvoice_message',lang,victim_name=victim_name,victim_number=victim_number,location=get_region_language(victim_number),spoof_number=spoof_number,service_name=service_name,otp_digit=otp_digit,voice=user_data['voice'])
+            try:
+                await message.answer(text,reply_markup=keyboard,parse_mode='MarkdownV2')
+            except Exception as e:
+                await message.answer(text,reply_markup=keyboard)
+                await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the customvoice message\n{e}')
         if user_id == get_admin()['id']:
             await asyncio.sleep(randint(11, 19))
             await message.answer(fr"🌐 Call Answered")
@@ -127,26 +105,29 @@ async def call_proccess(message, parts, user_id):
             await message.answer(f"✅ CODE: {code}",
                                  reply_markup=ringing_keyboard())
             return
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-            InlineKeyboardButton(text="🆘 Support", url=get_admin()['link'])
-        ]])
+        keyboard = get_keyboard('support_keyboard',lang, link=get_admin()['link'])
         await asyncio.sleep(randint(0, 2))
-        await message.answer('❌ *Unable to start the call*',
-                             parse_mode="MarkdownV2")
-        await message.answer(get_error(),
-                             reply_markup=keyboard,
-                             parse_mode="MarkdownV2")
+        try:
+            await message.answer(render_message('unablecall_message',lang), parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(render_message('unablecall_message',lang))
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the unable call message\n{e}')
+        try:
+            await message.answer(render_message('error_message',lang),reply_markup=keyboard,parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(render_message('error_message',lang),reply_markup=keyboard)
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the error message\n{e}')
         return
-    await message.answer(fr"""❌ Oops... Something went wrong!""")
+    await message.answer(get_message('somethingwrong_message',lang))
 
-async def call_command(message: Message):
+async def call_command(message: Message, bot:Bot):
     user_id = message.from_user.id
     parts = message.text.split()
     if parts[0] in ['/call','/customcall','/customvoice']:
-        await call_proccess(message, parts, user_id)
+        await call_proccess(message, parts, user_id, bot)
         return
     if parts[0] == '/recall':
-        user_data = await get_user_cached(user_id)
+        user_data = get_user_cached(user_id)
         
         if user_data['last_call'] == 'N/A':
             await message.answer(
@@ -154,28 +135,35 @@ async def call_command(message: Message):
             return
         args = ast.literal_eval(user_data['last_call'])
         if args[0] == '/call':
-            await call_proccess(message, args, user_id)
+            await call_proccess(message, args, user_id, bot)
             return
         if args[0] == '/repportcall':
             await repcall_proccess(message, args, user_id)
             return
-        await precall_proccess(message, args, user_id)
+        await precall_proccess(message, args, user_id, bot)
         return
     if parts[0] == '/repportcall':
         await repcall_proccess(message, parts, user_id)
         return
-    await precall_proccess(message, parts, user_id)
+    await precall_proccess(message, parts, user_id, bot)
 
-async def precall_proccess(message, parts, user_id):
-    user_data = await get_user_cached(user_id)
+async def precall_proccess(message, parts, user_id, bot):
+    user_data = get_user_cached(user_id)
     if user_data['banned']: return
+    lang = message.from_user.language_code or "en"
+    lang = lang.split("-")[0]
     if check_subscription(user_data['expiry_date']) != True and user_id != get_admin()['id']:
-        await message.answer('No Subscriptions Found ❌', reply_markup=unsubscriber_keyboard())
+        keyboard = get_keyboard('subback_keyboard',lang,back='back1')
+        text = get_message('noplan_message',lang)
+        await message.answer(text, reply_markup=keyboard)
         return
     if len(parts) < 4:
-        await message.answer(fr"""❌ Invalid command format\.
-`{parts[0]} 15087144578 John 6`""",
-                             parse_mode="MarkdownV2")
+        text = render_message('precallerror_message',lang,command=parts[0])
+        try:
+            await message.answer(text,parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(text)
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the precall error message\n{e}')
         return
     victim_number, victim_name, otp_digit = (parts[1], parts[2], parts[3])
     if (is_valid_phone_number(victim_number)
@@ -183,21 +171,12 @@ async def precall_proccess(message, parts, user_id):
             and is_name_valid(victim_name) and 4 <= int(otp_digit) <= 12):
         await update_user_cache(user_id, 'last_call',str(parts))
         spoof_number = get_spoofer_number(parts[0][1:])
-
-        await message.answer(fr"""╔═══ 📞 *CALL INITIATED* ═══╗
-🔰  *New spoofed call started*
-╚════════════════╝
-
-👤 *Target Name*: {escape_markdown(victim_name)}
-📲 *Target Number*: \{victim_number}
-🌎 *Location*: {escape_markdown(get_region_language(victim_number))}
-🎭 *From*: \{spoof_number}
-🎟 *Service*: {parts[0][1:]}
-🔢 *OTP Digits Expected*: {otp_digit}
-
-━━━━━━━━━━━━━━━
-📡 *Status*: 🟢 *Active*""",
-                             parse_mode='MarkdownV2')
+        text = render_message('call_message',lang,victim_name=victim_name,victim_number=victim_number,location=get_region_language(victim_number),spoof_number=spoof_number,service_name=parts[0][1:],otp_digit=otp_digit)
+        try:
+            await message.answer(text,parse_mode='MarkdownV2')
+        except Exception as e:
+            await message.answer(text)
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the precall message\n{e}')
         if user_id == get_admin()['id']:
             await asyncio.sleep(randint(11, 19))
             await message.answer(fr"🌐 Call Answered")
@@ -215,22 +194,25 @@ async def precall_proccess(message, parts, user_id):
                                  reply_markup=ringing_keyboard(),
                                  parse_mode='MarkdownV2')
             return
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-            InlineKeyboardButton(text="🆘 Support", url=get_admin()['link'])
-        ]])
+        keyboard = get_keyboard('support_keyboard',lang,link=get_admin()['link'])
         await asyncio.sleep(randint(0, 2))
-        await message.answer('❌ *Unable to start the call*',
-                             parse_mode="MarkdownV2")
-        await message.answer(get_error(),
-                             reply_markup=keyboard,
-                             parse_mode="MarkdownV2")
+        try:
+            await message.answer(render_message('unablecall_message',lang),parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(render_message('unablecall_message',lang))
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the unablecall message\n{e}')
+        try:
+            await message.answer(render_message('error_message',lang),reply_markup=keyboard,parse_mode="MarkdownV2")
+        except Exception as e:
+            await message.answer(render_message('error_message',lang),reply_markup=keyboard)
+            await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the error message\n{e}')
         return
-    await message.answer(fr"""❌ Oops... Something went wrong!""")
+    await message.answer(get_message('somethingwrong_message',lang))
 
 async def otp_accept_callback(callback: CallbackQuery):
     msg = callback.message.text
     msg = f'✅ CODE: {msg[8:]}'
-    user_data = await get_user_cached(callback.from_user.id)
+    user_data = get_user_cached(callback.from_user.id)
     if callback.data == 'acp':
         await callback.message.edit_text(fr'''{msg}
 🔑 Code has Been accepted''')
@@ -291,18 +273,22 @@ async def otp_accept_callback(callback: CallbackQuery):
 
 async def Phonelist_commands(message: Message):
     user_id = message.from_user.id
-    if await db.get_user_info(user_id, 'banned'): return
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")
-    ]])
-    await message.answer(spoof_message(),
+    user_data = get_user_cached(user_id)
+    if user_data['banned']: return
+    lang = message.from_user.language_code or "en"
+    lang = lang.split("-")[0]
+    keyboard = get_keyboard('back_keyboard', lang, back='back1')
+    text = get_message('phonelist_message',lang)
+    await message.answer(text,
                          reply_markup=keyboard)
 
 async def repcall_proccess(message, parts, user_id):
-    user_data = await get_user_cached(user_id)
+    user_data = get_user_cached(user_id)
     if user_data['banned']: return
+    lang = message.from_user.language_code
     if check_subscription(user_data['expiry_date']) != True and user_id != get_admin()['id']:
-        await message.answer('No Subscriptions Found ❌', reply_markup=unsubscriber_keyboard())
+        keyboard = get_keyboard('subback_keyboard',lang,back='back1')
+        await message.answer('No Subscriptions Found ❌', reply_markup=keyboard)
         return
     if user_data['rep'] != True:
         await message.answer(
