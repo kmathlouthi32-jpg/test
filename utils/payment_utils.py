@@ -2,6 +2,7 @@ from datetime import datetime
 from .text_utils import escape_markdown
 import httpx
 from config import get_admin
+from .messages_manager import render_message
 
 COINS = {
     "btc": "bitcoin",
@@ -62,40 +63,31 @@ def check_subscription(expiry_date):
     expire_date = datetime.strptime(str(expiry_date), "%Y-%m-%d %H:%M:%S.%f")
     return expire_date > now
 
-def get_wallet_message(symbol: str, amount: float, wallet_type: int):
+def get_wallet_message(symbol: str, amount: float, wallet_type: int, lang:str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     symbol = symbol.upper()
 
     plans = {15:'V.I.P Spoofer',20: '1 Day Plan', 50: '4 Days Plan', 90: '1 Week Plan', 200: '1 Month Plan', 1000: 'LifeTime Plan'}
     wallets = [{
         'USDT': 'TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY',
-        'BTC': '12g9D3pdhse6HSS38LYJr9bwXUGkeRbVHd',
+        'BTC': 'bc1q98y83fh28y6ysklu9qmla7enuegldmgdcdawvk',
         'ETH': '0xc76acc06684b2e2a2d43b9ba3b5f2618cd7a6307',
         'SOL': '8Ra9HKVrKNakEeQfqDzrVn1sFoQoFmbR51UHMRweT9hY',
         'LTC': 'LRJ8n55djedy4jyKP3Kkqi6iEy3BYC1FLt'
     },
     {
-        'USDT': 'TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf',
-        'BTC': '1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC',
-        'ETH': '0x91ab56856eff7bc410fdac41c35a75d4e83410f6',
-        'SOL': 'GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts',
-        'LTC': 'LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm'
+        'USDT': 'THqWBtVxYRpWhgmMNd2M5nMkjTTVmsVgxh',
+        'BTC': '1M6Q4pFzofeBvA9e2CQ9rhtLyLkLc34p3q',
+        'ETH': '0x1c89c55def70cb0fccaf058abfc5a1e493d0e297',
+        'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
+        'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
     }
     ]
 
     plan = plans.get(amount, "Unknown Plan")
     wallet = wallets[wallet_type].get(symbol, "N/A")
-
-    return fr"""ℹ *Payment Details*
-━━━━━━━━━━━━━━━
-🪙 *Currency:* {symbol}
-💰 *Amount:* {escape_markdown(usd_to_crypto(symbol, amount))}
-📅 *Date:* {escape_markdown(now)}
-⏳ *Plan:* {escape_markdown(plan)}
-💳 *Wallet:* `{wallet}`
-
-🔐 *To complete your purchase:*
-_Send the amount via the *{symbol}* wallet and send a screenshot to *[Support]({get_admin()['link']})*_\."""
-
-
-
+    amnt = usd_to_crypto(symbol, amount)
+    #now = escape_markdown(now)
+    #plan = escape_markdown(plan)
+    message = render_message('wallet_message',lang,symbol=symbol,amount=amnt,date=now,plan=plan,wallet=wallet,link=get_admin()['link'])
+    return message
