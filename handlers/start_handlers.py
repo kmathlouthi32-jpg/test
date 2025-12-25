@@ -12,7 +12,7 @@ async def start_command(message: Message, bot:Bot):
             username = "@"+message.from_user.username
         else:
             username = 'N/A'
-        await bot.send_message(chat_id=get_admin()['id'],text=fr'''🆕 *New user*: {users_count}
+        await bot.send_message(chat_id=get_groups()['new_users_ID'],text=fr'''🆕 *New user*: {users_count}
 *Username*\: {username}
 *Name*\: `{escape_markdown(name)}`
 *User ID*\: `{str(user_id)}`''',parse_mode='MarkdownV2')
@@ -137,5 +137,6 @@ async def features_callback(callback: CallbackQuery, bot:Bot):
     except Exception as e:
         await callback.message.answer_video(get_video(),caption=text, reply_markup=keyboard)
         await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the features message\n{str(e)}')
+
 
 
