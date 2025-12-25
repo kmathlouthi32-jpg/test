@@ -109,7 +109,7 @@ async def send_all(message: types.Message, bot: Bot):
     msg_to_send = parts[1]  # Keep multi-line text
 
     # Get all non-banned users
-    user_ids = await get_all_users()  # must be async
+    user_ids = get_all_users()  # must be async
 
     sent = 0
     failed = 0
@@ -141,5 +141,6 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
