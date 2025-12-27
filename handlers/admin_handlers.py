@@ -53,7 +53,7 @@ async def switch_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     parts = message.text.split()
     if len(parts)<2: return
-    user_data = await get_user_cached(int(parts[1]))
+    user_data = get_user_cached(int(parts[1]))
     if user_data['wallet'] == 0:
         await update_user_cache(int(parts[1]),'wallet', 1)
         await message.answer(f"User {parts[1]} wallets switched✅")
@@ -141,6 +141,7 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
 
