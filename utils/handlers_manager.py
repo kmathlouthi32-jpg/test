@@ -30,7 +30,7 @@ async def add_user_fast(user_id: int):
         "voice": "Michael",
         "custom_script": "N/A",
         "rep": False,
-        "wallet": 1
+        "wallet": 0
     }
 
 async def update_user_cache(user_id: int, field: str, value):
@@ -39,3 +39,4 @@ async def update_user_cache(user_id: int, field: str, value):
 
 def get_all_users():
     return [user_id for user_id, data in USER_CACHE.items() if not data.get("banned", False)]
+
