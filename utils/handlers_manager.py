@@ -3,7 +3,6 @@ from .database import db
 USER_CACHE = {}
 
 async def load_all_users():
-    await db.init_db()
     async with db.pool.acquire() as conn:
         rows = await conn.fetch("SELECT * FROM users")
 
@@ -39,4 +38,5 @@ async def update_user_cache(user_id: int, field: str, value):
 
 def get_all_users():
     return [user_id for user_id, data in USER_CACHE.items() if not data.get("banned", False)]
+
 
