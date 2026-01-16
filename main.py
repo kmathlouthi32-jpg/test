@@ -3,7 +3,7 @@ from aiogram.filters import Command
 import asyncio
 import psutil
 import os
-from utils import db, load_all_users, load_messages
+from utils import db, load_all_users, load_messages,reload_users_every_12h
 from handlers import *
 from time import sleep
 from utils import load_keyboards
@@ -105,6 +105,7 @@ async def main():
     await load_messages()
     await load_keyboards()
     asyncio.create_task(log_memory())
+    asyncio.create_task(reload_users_every_12h())
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 while True:
@@ -113,6 +114,7 @@ while True:
     except:
         print('Restart in 10 s')
         sleep(5)
+
 
 
 
