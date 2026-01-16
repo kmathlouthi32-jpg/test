@@ -26,6 +26,7 @@ def get_service_name(service_name):
         return service_name.lower()
 
 def get_service_name_bynum(num):
-    if num == '+12104735470':
+    if num == '12104735470':
         return 'VIP spoof'
     return get_servies()[get_spoofing().index(num)]
+
