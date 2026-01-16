@@ -36,8 +36,10 @@ async def reload_users_every_12h():
 # =========================
 # USER HELPERS
 # =========================
-def is_new_user(user_id: int):
-    return user_id not in USER_CACHE
+def is_new_user(user_id:int):
+    if user_id not in USER_CACHE:
+        return True, len(USER_CACHE)+1
+    return False, len(USER_CACHE)
 
 
 def get_user_cached(user_id: int):
@@ -86,3 +88,4 @@ def get_all_users():
         for user_id, data in USER_CACHE.items()
         if not data.get("banned", False)
     ]
+
