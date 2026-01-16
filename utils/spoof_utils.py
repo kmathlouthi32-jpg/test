@@ -6,7 +6,7 @@ def check_spoof(spoof_number, service_name, name):
     try:
         service_place = get_spoofing_services().index(service_name.upper())
     except ValueError:
-        if spoof_number == '+12104735470':
+        if spoof_number == '12104735470':
             return True
         else:
             return 'service not found'
@@ -29,4 +29,5 @@ def get_service_name_bynum(num):
     if num == '12104735470':
         return 'VIP spoof'
     return get_servies()[get_spoofing().index(num)]
+
 
