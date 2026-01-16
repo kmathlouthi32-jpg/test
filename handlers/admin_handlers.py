@@ -1,6 +1,6 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import get_admin, get_groups
-from utils import db, update_user_cache, get_user_cached, get_all_users
+from utils import db, update_user_cache, get_user_cached, get_all_users, load_all_users
 from aiogram import Bot
 import asyncio
 from aiogram import types
@@ -16,6 +16,11 @@ def keys_type():
         InlineKeyboardButton(text="1 Month", callback_data="1 month")],
         [InlineKeyboardButton(text="Lifetime", callback_data="lifetime")],
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]])
+
+async def reload_command(message: Message):
+    if message.from_user.id != get_admin()['id']: return
+    await load_all_users()
+    await message.answer("♻️ Reloaded all users!")
 
 async def ban_command(message: Message, bot:Bot):
     if message.from_user.id != get_admin()['id']: return
@@ -141,6 +146,7 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
 
