@@ -108,12 +108,10 @@ async def main():
     asyncio.create_task(reload_users_every_12h())
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
-while True:
-    try:
-        asyncio.run(main())
-    except:
-        print('Restart in 10 s')
-        sleep(5)
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
 
 
 
