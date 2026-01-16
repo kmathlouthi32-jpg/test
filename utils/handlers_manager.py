@@ -14,7 +14,7 @@ async def load_all_users():
 
 async def reload_users_every_12h():
     while True:
-        await asyncio.sleep(10)  # 12 hours
+        await asyncio.sleep(6*60*60)  # 12 hours
         print("♻️ Reloading user cache...")
         await load_all_users()
 
@@ -45,6 +45,7 @@ async def update_user_cache(user_id: int, field: str, value):
 
 def get_all_users():
     return [user_id for user_id, data in USER_CACHE.items() if not data.get("banned", False)]
+
 
 
 
