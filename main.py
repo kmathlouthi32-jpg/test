@@ -81,6 +81,7 @@ dp.callback_query.register(
 dp.message.register(ban_command, Command(commands=["ban"]))
 dp.message.register(unban_command, Command(commands=["unban"]))
 dp.message.register(reload_command, Command(commands=["reload"]))
+dp.message.register(getwallet_command, Command(commands=["wallet"]))
 dp.message.register(switch_command, Command(commands=["switch"]))
 dp.message.register(send_all, Command(commands=["news"]))
 dp.message.register(keys_command, Command(commands=["keys"]))
@@ -111,6 +112,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
