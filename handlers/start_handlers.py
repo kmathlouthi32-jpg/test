@@ -1,11 +1,11 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram import Bot
-from utils import escape_markdown_text, fast_translate,escape_markdown_user, get_keyboard, preload_language_keyboard, add_user_fast, escape_markdown, get_user_cached, is_new_user, render_message, render_message, preload_language, is_lang_exist
+from utils import escape_markdown_user, escape_markdown_text, fast_translate,escape_markdown_user, get_keyboard, preload_language_keyboard, add_user_fast, escape_markdown, get_user_cached, is_new_user, render_message, render_message, preload_language, is_lang_exist
 from config import get_admin, get_groups, get_proof, get_video
 
 async def start_command(message: Message, bot:Bot):
     user_id = message.from_user.id
-    name = escape_markdown_text(message.from_user.first_name)
+    name = escape_markdown_user(message.from_user.first_name)
     new,users_count = is_new_user(user_id)
     if new:
         if message.from_user.username:
@@ -137,6 +137,7 @@ async def features_callback(callback: CallbackQuery, bot:Bot):
     except Exception as e:
         await callback.message.answer_video(get_video(),caption=text, reply_markup=keyboard)
         await bot.send_message(get_admin()['id'],f'⚠ problem in {lang} Language in the features message\n{str(e)}')
+
 
 
 
