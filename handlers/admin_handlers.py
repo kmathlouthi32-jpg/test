@@ -44,7 +44,7 @@ async def getwallet_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     parts = message.text.split()
     if len(parts)<3: return
-    user_data = await get_user_cached(int(parts[1]))
+    user_data = get_user_cached(int(parts[1]))
     await message.answer(get_wallet(user_data['wallet'],parts[2]),parse_mode='MarkdownV2')
 
 async def ban_command(message: Message, bot:Bot):
@@ -171,6 +171,7 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
 
