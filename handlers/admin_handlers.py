@@ -6,6 +6,24 @@ import asyncio
 from aiogram import types
 from aiogram.exceptions import TelegramRetryAfter, TelegramAPIError
 
+def get_wallet(x, crypto):
+    wallets = [{
+        'USDT': '`TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf`',
+        'BTC': '`1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC`',
+        'ETH': '`0x91ab56856eff7bc410fdac41c35a75d4e83410f6`',
+        'SOL': '`GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts`',
+        'LTC': '`LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm`'
+    },
+    {
+        'USDT': '`TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY`',
+        'BTC': '`12g9D3pdhse6HSS38LYJr9bwXUGkeRbVHd`',
+        'ETH': '`0xc76acc06684b2e2a2d43b9ba3b5f2618cd7a6307`',
+        'SOL': '`8Ra9HKVrKNakEeQfqDzrVn1sFoQoFmbR51UHMRweT9hY`',
+        'LTC': '`LRJ8n55djedy4jyKP3Kkqi6iEy3BYC1FLt`'
+    }
+    ]
+
+    return wallets[x][crypto.upper()]
 
 def keys_type():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -21,6 +39,13 @@ async def reload_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     await load_all_users()
     await message.answer("♻️ Reloaded all users!")
+
+async def getwallet_command(message: Message):
+    if message.from_user.id != get_admin()['id']: return
+    parts = message.text.split()
+    if len(parts)<3: return
+    user_data = await get_user_cached(int(parts[1]))
+    await message.answer(get_wallet(user_data['wallet'],parts[2]),parse_mode='MarkdownV2')
 
 async def ban_command(message: Message, bot:Bot):
     if message.from_user.id != get_admin()['id']: return
@@ -146,6 +171,7 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
 
