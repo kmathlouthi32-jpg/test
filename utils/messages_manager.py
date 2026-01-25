@@ -4,6 +4,7 @@ from .database import db
 from utils.translate import fast_translate
 from utils.text_utils import escape_markdown, escape_markdown_link
 import asyncio
+from asyncio import Lock
 
 # =============================
 # CONSTANTS
@@ -115,16 +116,17 @@ def tokens_to_markdown(text: str) -> str:
 # =============================
 
 MESSAGE_CACHE: Dict[str, Dict[str, str]] = {}
-
-
-# =============================
-# LOAD MESSAGES
-# =============================
+MESSAGE_CACHE_LOCK = Lock()
 
 async def load_messages():
-    global MESSAGE_CACHE
-    MESSAGE_CACHE = await db.load_all_messages() or {}
-    print(f"🚀 Loaded {len(MESSAGE_CACHE)} messages into memory")
+    # Load from DB first
+    messages = await db.load_all_messages() or {}
+
+    # Safely replace the cache
+    async with MESSAGE_CACHE_LOCK:
+        MESSAGE_CACHE.clear()
+        MESSAGE_CACHE.update(messages)
+    print(f"♻️ Reloaded {len(MESSAGE_CACHE)} messages into RAM")
 
 
 def is_lang_exist(lang: str) -> bool:
