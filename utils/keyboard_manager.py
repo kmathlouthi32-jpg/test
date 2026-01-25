@@ -17,8 +17,23 @@ async def load_keyboards():
         print("⚠️ No keyboards found in database")
         KEYBOARD_CACHE = {}
         return
-    KEYBOARD_CACHE = keyboards
+
+    # Make sure all entries are dicts, not JSON strings
+    clean_cache = {}
+    for key, langs in keyboards.items():
+        clean_cache[key] = {}
+        for lang, data in langs.items():
+            if isinstance(data, str):
+                try:
+                    clean_cache[key][lang] = json.loads(data)
+                except Exception:
+                    clean_cache[key][lang] = {}  # fallback empty dict
+            else:
+                clean_cache[key][lang] = data
+
+    KEYBOARD_CACHE = clean_cache
     print(f"⌨️ Loaded {len(KEYBOARD_CACHE)} keyboards into RAM")
+
 
 SEM = asyncio.Semaphore(5)
 
@@ -28,6 +43,7 @@ async def safe_translate(text, lang):
             return await fast_translate(text, lang)
         except Exception:
             return text
+
 
 async def preload_language_keyboard(lang: str):
     if lang == "en":
