@@ -1,6 +1,6 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import get_admin, get_groups
-from utils import db, update_user_cache, get_user_cached, get_all_users, load_all_users
+from utils import db, update_user_cache, get_user_cached, get_all_users, load_all_users, load_messages
 from aiogram import Bot
 import asyncio
 from aiogram import types
@@ -39,6 +39,11 @@ async def reload_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     await load_all_users()
     await message.answer("♻️ Reloaded all users!")
+
+async def reload_messages_command(message: Message):
+    if message.from_user.id != get_admin()['id']: return
+    await load_messages()
+    await message.answer("♻️ Reloaded all messages!")
 
 async def getwallet_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
