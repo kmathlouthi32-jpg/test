@@ -7,6 +7,7 @@ from utils import db, load_all_users, load_messages,reload_users_every_12h
 from handlers import *
 from time import sleep
 from utils import load_keyboards
+from config import get_admin
 
 asyncio.set_event_loop(asyncio.new_event_loop())
 
@@ -114,6 +115,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
