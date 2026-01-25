@@ -45,7 +45,7 @@ dp.message.register(redeem_keys, Command(commands=["redeem"]))
 
 # CALLBACKS
 dp.callback_query.register(wallets_callback,
-                           lambda c: c.data in ['15','20', '50', '90', '200','1000'])
+                           lambda c: c.data in ['15','25', '89', '149', '299','999'])
 dp.callback_query.register(wallet_callback, lambda c: ':' in c.data)
 dp.callback_query.register(purchase_callback, lambda c: c.data == "purchase")
 
@@ -81,6 +81,7 @@ dp.callback_query.register(
 dp.message.register(ban_command, Command(commands=["ban"]))
 dp.message.register(unban_command, Command(commands=["unban"]))
 dp.message.register(reload_command, Command(commands=["reload"]))
+dp.message.register(reload_messages_command, Command(commands=["refresh"]))
 dp.message.register(getwallet_command, Command(commands=["wallet"]))
 dp.message.register(switch_command, Command(commands=["switch"]))
 dp.message.register(send_all, Command(commands=["news"]))
@@ -108,10 +109,12 @@ async def main():
     await load_keyboards()
     asyncio.create_task(log_memory())
     asyncio.create_task(reload_users_every_12h())
+    await bot.send_message(get_admin()['id'],'🟢 Bot online')
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
