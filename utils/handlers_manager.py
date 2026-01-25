@@ -1,4 +1,5 @@
 from .database import db
+from .messages_manager import load_messages
 import asyncio
 
 # =========================
@@ -23,15 +24,15 @@ async def load_all_users():
     async with USER_CACHE_LOCK:
         for row in rows:
             USER_CACHE[row["user_id"]] = dict(row)
-
     print(f"♻️ Reloaded {len(USER_CACHE)} users into RAM")
 
 
 async def reload_users_every_12h():
     while True:
-        await asyncio.sleep(12 * 60 * 60)  # 12 hours
+        await asyncio.sleep(6 * 60 * 60)  # 12 hours
         print("⏳ 12h reached → reloading users")
         await load_all_users()
+        await load_messages()
 
 # =========================
 # USER HELPERS
