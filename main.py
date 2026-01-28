@@ -8,6 +8,7 @@ from handlers import *
 from time import sleep
 from utils import load_keyboards
 from config import get_admin
+from messages import start_telethon_worker
 
 asyncio.set_event_loop(asyncio.new_event_loop())
 
@@ -111,10 +112,25 @@ async def main():
     asyncio.create_task(log_memory())
     asyncio.create_task(reload_users_every_12h())
     await bot.send_message(get_admin()['id'],'🟢 Bot online')
+    telethon_task = asyncio.create_task(start_telethon_worker())
+    await bot.send_message(get_admin()['id'],'🟢 Bot online')
+    try:
+        await dp.start_polling(bot)
+    finally:
+        print("🛑 Shutting down...")
+
+        telethon_task.cancel()
+        try:
+            await telethon_task
+        except asyncio.CancelledError:
+            pass
+
+        await bot.session.close()
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
