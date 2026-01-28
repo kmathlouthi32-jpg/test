@@ -66,7 +66,7 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int, lang:str):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     symbol = symbol.upper()
 
-    plans = {15:'V.I.P Spoofer',20: '1 Day Plan', 50: '4 Days Plan', 90: '1 Week Plan', 200: '1 Month Plan', 1000: 'LifeTime Plan'}
+    plans = {15:'V.I.P Spoofer',25: '1 Day Plan', 89: '4 Days Plan', 149: '1 Week Plan', 299: '1 Month Plan', 999: 'LifeTime Plan'}
     wallets = [{
         'USDT': 'TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf',
         'BTC': '1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC',
@@ -90,4 +90,5 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int, lang:str):
     #plan = escape_markdown(plan)
     message = render_message('wallet_message',lang,symbol=symbol,amount=amnt,date=now,plan=plan,wallet=wallet,link=get_admin()['link'])
     return message
+
 
