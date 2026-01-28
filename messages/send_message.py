@@ -109,7 +109,7 @@ async def daily_job(client):
     """Run the task every day at 06:34 USA Eastern time"""
     while True:
         now = datetime.now(TZ)
-        target = now.replace(hour=6, minute=39, second=0, microsecond=0)
+        target = now.replace(hour=8, minute=0, second=0, microsecond=0)
         if now >= target:
             target += timedelta(days=1)
 
@@ -131,6 +131,7 @@ async def start_telethon_worker():
             print("🛑 Telethon worker stopped cleanly")
         except Exception as e:
             print(f"❌ Telethon worker crashed: {e}")
+
 
 
 
