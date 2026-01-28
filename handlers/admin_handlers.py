@@ -163,11 +163,7 @@ async def send_all(message: types.Message, bot: Bot):
 
                 except TelegramAPIError as e:
                     error_text = str(e)
-                    if "bot was blocked by the user" in error_text:
-                        await message.answer(f"❌ User {user_id} blocked the bot. Skipping.")
-                    elif "chat not found" in error_text:
-                        await message.answer(f"❌ User {user_id} account deleted. ban.")
-                        await update_user_cache(user_id, 'banned',True)
+                    print(error_text)
                     failed += 1
 
     except Exception as e:
@@ -176,6 +172,7 @@ async def send_all(message: types.Message, bot: Bot):
         return
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
+
 
 
 
