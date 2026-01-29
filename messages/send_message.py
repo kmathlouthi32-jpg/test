@@ -1,7 +1,7 @@
 import asyncio
 import random
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytz
 from telethon import TelegramClient, errors
@@ -22,6 +22,9 @@ FILES = {
     "text":  "messages/text_only.txt",
 }
 
+# 🚫 SPAM LIMIT EXPIRATION (UTC)
+UNLIMIT_TIME_UTC = datetime(2026, 2, 1, 2, 41, tzinfo=timezone.utc)
+
 # ==========================================
 
 
@@ -33,8 +36,26 @@ def load_group_names(filename):
         return set()
 
 
+async def sleep_until_unlimited():
+    """Sleep until Telegram spam limit expires"""
+    now = datetime.now(timezone.utc)
+
+    if now >= UNLIMIT_TIME_UTC:
+        print("✅ Spam limit expired, continuing normally")
+        return
+
+    seconds = (UNLIMIT_TIME_UTC - now).total_seconds()
+    hours = seconds / 3600
+
+    print(
+        f"⛔ Account limited. Sleeping for "
+        f"{hours:.2f} hours until {UNLIMIT_TIME_UTC} UTC"
+    )
+
+    await asyncio.sleep(seconds)
+
+
 async def collect_saved_messages(client):
-    """Collect fresh Saved Messages every run"""
     saved = await client.get_entity("me")
 
     videos, photos, texts = [], [], []
@@ -51,9 +72,8 @@ async def collect_saved_messages(client):
 
 
 async def send_media_safe(client, entity, msg, media_type, title):
-    """
-    Download + reupload media (NO expired references)
-    """
+    file_path = None
+
     try:
         file_path = await client.download_media(msg)
 
@@ -93,17 +113,14 @@ async def main(client):
             continue
 
         try:
-            # 🎥 VIDEO
             if title in video_groups and videos:
                 msg = random.choice(videos)
                 await send_media_safe(client, entity, msg, "🎥 VIDEO", title)
 
-            # 🖼 PHOTO
             elif title in photo_groups and photos:
                 msg = random.choice(photos)
                 await send_media_safe(client, entity, msg, "🖼 PHOTO", title)
 
-            # 📝 TEXT
             elif title in text_groups and texts:
                 msg = random.choice(texts)
                 await client.send_message(entity, msg.text)
@@ -146,10 +163,11 @@ async def start_telethon_worker():
         api_hash,
         receive_updates=False
     ) as client:
+
         print("🚀 Telethon worker started (updates disabled)")
+
+        # ⛔ WAIT UNTIL SPAM LIMIT EXPIRES
+        await sleep_until_unlimited()
+
+        # ▶️ START NORMAL DAILY JOB
         await daily_job(client)
-)
-
-
-
-
