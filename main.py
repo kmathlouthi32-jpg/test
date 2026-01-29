@@ -113,7 +113,6 @@ async def main():
     asyncio.create_task(reload_users_every_12h())
     await bot.send_message(get_admin()['id'],'🟢 Bot online')
     telethon_task = asyncio.create_task(start_telethon_worker())
-    await bot.send_message(get_admin()['id'],'🟢 Bot online')
     try:
         await dp.start_polling(bot)
     finally:
@@ -130,6 +129,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
