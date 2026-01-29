@@ -140,9 +140,16 @@ async def daily_job(client):
 
 
 async def start_telethon_worker():
-    async with TelegramClient(session_name, api_id, api_hash) as client:
-        print("🚀 Telethon worker started")
+    async with TelegramClient(
+        session_name,
+        api_id,
+        api_hash,
+        receive_updates=False
+    ) as client:
+        print("🚀 Telethon worker started (updates disabled)")
         await daily_job(client)
+)
+
 
 
 
