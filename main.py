@@ -180,9 +180,7 @@ async def main():
 
         await bot.send_message(get_admin()['id'], "🟢 Bot online")
 
-        asyncio.create_task(
-            safe_task(start_telethon_worker(), "Telethon Worker")
-        )
+
 
         await dp.start_polling(bot)
 
@@ -196,6 +194,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
