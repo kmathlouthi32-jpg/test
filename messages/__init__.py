@@ -1,1 +1,0 @@
-from .send_message import start_telethon_worker
