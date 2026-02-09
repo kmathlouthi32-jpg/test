@@ -129,7 +129,7 @@ dp.callback_query.register(
 
 dp.callback_query.register(
     wallet_callback,
-    lambda c: c.data.startswith("wallet:")
+    lambda c: ':' in c.data
 )
 
 dp.callback_query.register(purchase_callback, lambda c: c.data == "purchase")
@@ -220,3 +220,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
