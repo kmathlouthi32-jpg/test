@@ -75,11 +75,11 @@ def get_wallet_message(symbol: str, amount: float, wallet_type: int, lang:str):
         'LTC': 'LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm'
     },
     {
-        'USDT': 'TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY',
-        'BTC': '12g9D3pdhse6HSS38LYJr9bwXUGkeRbVHd',
-        'ETH': '0xc76acc06684b2e2a2d43b9ba3b5f2618cd7a6307',
-        'SOL': '8Ra9HKVrKNakEeQfqDzrVn1sFoQoFmbR51UHMRweT9hY',
-        'LTC': 'LRJ8n55djedy4jyKP3Kkqi6iEy3BYC1FLt'
+        'USDT': 'THqWBtVxYRpWhgmMNd2M5nMkjTTVmsVgxh',
+        'BTC': '1M6Q4pFzofeBvA9e2CQ9rhtLyLkLc34p3q',
+        'ETH': '0x1c89c55def70cb0fccaf058abfc5a1e493d0e297',
+        'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
+        'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
     }
     ]
 
