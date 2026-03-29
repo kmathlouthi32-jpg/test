@@ -21,7 +21,7 @@ def get_wallet(x, crypto):
         'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
         'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
     }
-    ]]
+    ]
 
     return wallets[x][crypto.upper()]
 
