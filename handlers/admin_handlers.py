@@ -8,20 +8,20 @@ from aiogram.exceptions import TelegramRetryAfter, TelegramAPIError
 
 def get_wallet(x, crypto):
     wallets = [{
-        'USDT': '`TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf`',
-        'BTC': '`1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC`',
-        'ETH': '`0x91ab56856eff7bc410fdac41c35a75d4e83410f6`',
-        'SOL': '`GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts`',
-        'LTC': '`LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm`'
+        'USDT': 'TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf',
+        'BTC': '1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC',
+        'ETH': '0x91ab56856eff7bc410fdac41c35a75d4e83410f6',
+        'SOL': 'GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts',
+        'LTC': 'LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm'
     },
     {
-        'USDT': '`TRRVAuPEGJ4EgE33u1pV6gNUXxM1R5v1aY`',
-        'BTC': '`12g9D3pdhse6HSS38LYJr9bwXUGkeRbVHd`',
-        'ETH': '`0xc76acc06684b2e2a2d43b9ba3b5f2618cd7a6307`',
-        'SOL': '`8Ra9HKVrKNakEeQfqDzrVn1sFoQoFmbR51UHMRweT9hY`',
-        'LTC': '`LRJ8n55djedy4jyKP3Kkqi6iEy3BYC1FLt`'
+        'USDT': 'THqWBtVxYRpWhgmMNd2M5nMkjTTVmsVgxh',
+        'BTC': '1M6Q4pFzofeBvA9e2CQ9rhtLyLkLc34p3q',
+        'ETH': '0x1c89c55def70cb0fccaf058abfc5a1e493d0e297',
+        'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
+        'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
     }
-    ]
+    ]]
 
     return wallets[x][crypto.upper()]
 
