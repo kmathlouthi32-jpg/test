@@ -55,11 +55,12 @@ async def add_user_fast(user_id: int):
             "user_id": user_id,
             "banned": False,
             "expiry_date": "N/A",
-            "last_call": "N/A",
-            "voice": "Michael",
-            "custom_script": "N/A",
+            "script": "Default",
             "rep": False,
-            "wallet": 0
+            "wallet": 0,
+            "caller_id": 'Default',
+            'my_number': 'Not set',
+            'lang': '🇺🇸 English'
         }
 
 
@@ -70,11 +71,12 @@ async def update_user_cache(user_id: int, field: str, value):
                 "user_id": user_id,
                 "banned": False,
                 "expiry_date": "N/A",
-                "last_call": "N/A",
-                "voice": "Michael",
-                "custom_script": "N/A",
+                "script": "Default",
                 "rep": False,
-                "wallet": 0
+                "wallet": 0,
+                "caller_id": 'Default',
+                'my_number': 'Not set',
+                'lang': '🇺🇸 English'
             }
 
         USER_CACHE[user_id][field] = value
