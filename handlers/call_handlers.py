@@ -64,7 +64,7 @@ async def call_proccess(message, parts, user_id, bot):
             and is_valid_phone_number(spoof_number)
             and check_spoof(spoof_number, service_name, victim_name) == True
             and is_name_valid(victim_name) and 4 <= int(otp_digit) <= 12):
-        await update_user_cache(user_id, 'last_call',str(parts))
+
         keyboard = InlineKeyboardMarkup(inline_keyboard=[[
                 InlineKeyboardButton(text="End Call", callback_data="end_call")
             ]])
@@ -126,22 +126,6 @@ async def call_command(message: Message, bot:Bot):
     if parts[0] in ['/call','/customcall','/customvoice']:
         await call_proccess(message, parts, user_id, bot)
         return
-    if parts[0] == '/recall':
-        user_data = get_user_cached(user_id)
-        
-        if user_data['last_call'] == 'N/A':
-            await message.answer(
-                "⚠️ No saved call found. Please use /call first.")
-            return
-        args = ast.literal_eval(user_data['last_call'])
-        if args[0] == '/call':
-            await call_proccess(message, args, user_id, bot)
-            return
-        if args[0] == '/repportcall':
-            await repcall_proccess(message, args, user_id)
-            return
-        await precall_proccess(message, args, user_id, bot)
-        return
     if parts[0] == '/repportcall':
         await repcall_proccess(message, parts, user_id)
         return
@@ -169,7 +153,6 @@ async def precall_proccess(message, parts, user_id, bot):
     if (is_valid_phone_number(victim_number)
             and victim_number not in get_spoofing()
             and is_name_valid(victim_name) and 4 <= int(otp_digit) <= 12):
-        await update_user_cache(user_id, 'last_call',str(parts))
         spoof_number = get_spoofer_number(parts[0][1:])
         text = render_message('call_message',lang,victim_name=victim_name,victim_number=victim_number,location=get_region_language(victim_number),spoof_number=spoof_number,service_name=parts[0][1:],otp_digit=otp_digit)
         try:
@@ -310,7 +293,6 @@ Please upgrade or purchase the required option to continue\.""",
             and user_name.upper() not in get_spoofing_services()
             and user_sex.upper() in ['F', 'M']
             and methode.upper() in ['Y', 'N']):
-        await update_user_cache(user_id, 'last_call',str(parts))
         await message.answer(fr"📴 Configure the number `{user_number}`",
                              parse_mode='MarkdownV2')
         await asyncio.sleep(randint(10, 20))
