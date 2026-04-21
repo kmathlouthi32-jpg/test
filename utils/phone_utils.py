@@ -1,26 +1,20 @@
 import phonenumbers
-from phonenumbers import NumberParseException,geocoder
-
-
-def get_region_language(phone_number: str) -> str:
-    if phone_number[0] != '+':
-        phone_number = '+'+phone_number
-    try:
-        parsed_number = phonenumbers.parse(phone_number)
-
-        country_name = geocoder.country_name_for_number(parsed_number, "en")
-
-        return country_name or "Unknown"
-    except Exception:
-        return "Unknown"
-
+from phonenumbers import NumberParseException
 
 def is_valid_phone_number(number: str, region: str = None) -> bool:
-    if number[0] != '+':
-        number = '+'+number
     try:
         parsed_number = phonenumbers.parse(number, region)
         return phonenumbers.is_valid_number(parsed_number)
     except NumberParseException:
         return False
-    
+
+def mask_phone_number(number: str) -> str:
+
+    if not number or not number.startswith('+'):
+        return number
+
+    prefix = number[:3]   # '+' + first 3 digits
+    suffix = number[-3:]  # last 2 digits
+    masked = '*' * (len(number) - len(prefix) - len(suffix))
+
+    return f"{prefix}{masked}{suffix}"
