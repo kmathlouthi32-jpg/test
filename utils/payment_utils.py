@@ -1,6 +1,5 @@
 from datetime import datetime
 import httpx
-from config import get_admin
 from typing import Union
 
 COINS = {
