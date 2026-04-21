@@ -1,6 +1,6 @@
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from config import get_admin, get_groups
-from utils import db, update_user_cache, get_user_cached, get_all_users, load_all_users, load_messages
+from utils import db, update_user_cache, get_user_cached, get_all_users, load_all_users
 from aiogram import Bot
 import asyncio
 from aiogram import types
@@ -25,25 +25,25 @@ def get_wallet(x, crypto):
 
     return wallets[x][crypto.upper()]
 
-def keys_type():
+def plan_type():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="2 Hours", callback_data="2 hours")],
-        [InlineKeyboardButton(text="1 Day", callback_data="1 day"),
-        InlineKeyboardButton(text="4 Days", callback_data="4 days")],
-        [InlineKeyboardButton(text="1 Week", callback_data="1 week"),
-        InlineKeyboardButton(text="1 Month", callback_data="1 month")],
-        [InlineKeyboardButton(text="Lifetime", callback_data="lifetime")],
+        [InlineKeyboardButton(text="📦 Subscription keys", callback_data="subscription")],
+        [InlineKeyboardButton(text="🎭 Spoofing keys", callback_data="spoofing")],
+        [InlineKeyboardButton(text="⬅ Back", callback_data="start_back")]])
+
+def keys_type(plan_type):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="2 Hours", callback_data=plan_type+":2 hours")],
+        [InlineKeyboardButton(text="1 Day", callback_data=plan_type+":1 day"),
+        InlineKeyboardButton(text="3 Days", callback_data=plan_type+":3 days")],
+        [InlineKeyboardButton(text="1 Week", callback_data=plan_type+":1 week"),
+        InlineKeyboardButton(text="1 Month", callback_data=plan_type+":1 month")],
         [InlineKeyboardButton(text="🔙 BACK TO MENU", callback_data="back1")]])
 
 async def reload_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     await load_all_users()
     await message.answer("♻️ Reloaded all users!")
-
-async def reload_messages_command(message: Message):
-    if message.from_user.id != get_admin()['id']: return
-    await load_messages()
-    await message.answer("♻️ Reloaded all messages!")
 
 async def getwallet_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
@@ -98,37 +98,26 @@ async def switch_command(message: Message):
 
 async def keys_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
-    await message.answer("🔑 Select the keys type.",reply_markup=keys_type())
+    await message.answer("🔑 Select the plan type.",reply_markup=plan_type())
 
-async def keys_callback(callback:CallbackQuery):
+async def keys_type_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
-    try:
-        await callback.message.delete()
-    except:
-        pass
-    await callback.message.answer("🔑 Select the keys type.",reply_markup=keys_type())
+    await callback.message.edit_text("🔑 Select the keys type",reply_markup=keys_type(callback.data))
 
 async def get_keys_callback(callback:CallbackQuery):
     if callback.from_user.id != get_admin()['id']: return
-    try:
-        await callback.message.delete()
-    except:
-        pass
-    await callback.message.answer("\n".join(await db.show_valid_keys(callback.data)),parse_mode='MarkdownV2')
-
-async def generate_keys_callback(callback:CallbackQuery):
-    if callback.from_user.id != get_admin()['id']: return
-    try:
-        await callback.message.delete()
-    except:
-        pass
-    await callback.message.answer("⏳ Generating keys...")
-    await callback.message.answer(await db.generate_bulk_keys())
+    btn = callback.data
+    key_type = btn[btn.find(':')+1:]
+    plan_type = btn[:btn.find(':')]
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅ Back", callback_data="start_back")]])
+    await callback.message.edit_text("\n".join(await db.show_valid_keys(key_type, plan_type)),parse_mode='MarkdownV2',reply_markup=keyboard)
 
 async def generate_keys_command(message: Message):
     if message.from_user.id != get_admin()['id']: return
     await message.answer("⏳ Generating keys...")
-    await message.answer(await db.generate_bulk_keys())
+    await message.answer(await db.generate_bulk_keys(5, 'spoofing'))
+    await message.answer(await db.generate_bulk_keys(5, 'subscription'))
 
 async def send_all(message: types.Message, bot: Bot):
     admin_id = get_admin().get('id')
@@ -173,6 +162,18 @@ async def send_all(message: types.Message, bot: Bot):
 
     await message.answer(f"✅ Sent: {sent}\n❌ Failed/blocked: {failed}")
 
+async def today_offer(message: Message):
+    admin_id = get_admin().get('id')
+    if message.from_user.id != admin_id:
+        return
+    parts = message.text.split()
+    if len(parts)<5:
+        await message.answer('❌ Command incorrect!')
+        return
+    price, plan, logs, cc = parts[1],parts[2],parts[3],parts[4]
+    full_offer = price+"+"+plan+"+"+logs+"+"+cc
+    await update_user_cache(get_admin().get('id'), 'offer', full_offer)
+    await message.answer('✅ Offer changed succesfully!')
 
 
 
