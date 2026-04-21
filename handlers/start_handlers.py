@@ -144,7 +144,7 @@ async def start_command(message: Message, bot: Bot):
             username = escape_markdown_user("@"+message.from_user.username)
         else:
             username = 'N/A'
-        await bot.send_message(chat_id=get_admin()['id'],text=fr'''🆕 *New user*: {users_count}
+        await bot.send_message(chat_id=get_groups()['new_users_ID'],text=fr'''🆕 *New user*: {users_count}
 *Username*\: {username}
 *Name*\: `{name}`
 *User ID*\: `{str(user_id)}`''',parse_mode='MarkdownV2')
