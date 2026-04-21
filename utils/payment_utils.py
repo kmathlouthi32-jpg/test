@@ -1,40 +1,63 @@
 from datetime import datetime
 import httpx
 from config import get_admin
-from .messages_manager import render_message
+from typing import Union
 
 COINS = {
-    "btc": "bitcoin",
-    "eth": "ethereum",
-    "ltc": "litecoin",
-    "sol": "solana",
-    "usdt": "tether"
+    # your original stack
+    "btc":  "bitcoin",
+    "eth":  "ethereum",
+    "ltc":  "litecoin",
+    "sol":  "solana",
+    "usdt": "tether",
+    # stablecoins
+    "usdc": "usd-coin",
+    "dai":  "dai",
+    # evm / l2
+    "bnb":  "binancecoin",
+    "pol":  "matic-network",
+    "avax": "avalanche-2",
+    "ton":  "the-open-network",
+    "trx":  "tron",
+    # other chains
+    "xrp":  "ripple",
+    "ada":  "cardano",
+    "dot":  "polkadot",
+    # meme
+    "doge": "dogecoin",
+    "shib": "shiba-inu",
 }
 
-def get_price(symbol):
-    symbol = symbol.lower()
+COINGECKO_BASE = "https://api.coingecko.com/api/v3"
+
+
+def get_price(symbol: str, vs: str = "usd") -> Union[float, None]:
+    symbol = symbol.lower().strip()
+
     if symbol not in COINS:
-        raise ValueError(f"Unsupported coin: {symbol}")
+        supported = ", ".join(COINS.keys())
+        raise ValueError(
+            f"Unsupported coin: '{symbol}'. Supported: {supported}"
+        )
 
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {
-        "ids": COINS[symbol],
-        "vs_currencies": "usd"
-    }
+    coin_id = COINS[symbol]
+    url = f"{COINGECKO_BASE}/simple/price"
+    params = {"ids": coin_id, "vs_currencies": vs}
 
-    r = httpx.get(url, params=params)
-
-    # validate response
-    if r.status_code != 200:
-        raise Exception(f"API error: {r.status_code} | {r.text}")
+    try:
+        r = httpx.get(url, params=params, timeout=10)
+        r.raise_for_status()
+    except httpx.TimeoutException:
+        raise Exception("CoinGecko request timed out")
+    except httpx.HTTPStatusError as e:
+        raise Exception(f"API error {e.response.status_code}: {e.response.text}")
 
     data = r.json()
 
-    # check if coin exists in response
-    if COINS[symbol] not in data:
-        raise Exception(f"CoinGecko returned no data: {data}")
+    if coin_id not in data or vs not in data[coin_id]:
+        raise Exception(f"No price data returned for {symbol.upper()}/{vs.upper()}")
 
-    return data[COINS[symbol]]["usd"]
+    return data[coin_id][vs]
 
 
 def usd_to_crypto(symbol, usd_amount):
@@ -62,33 +85,5 @@ def check_subscription(expiry_date):
     expire_date = datetime.strptime(str(expiry_date), "%Y-%m-%d %H:%M:%S.%f")
     return expire_date > now
 
-def get_wallet_message(symbol: str, amount: float, wallet_type: int, lang:str):
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    symbol = symbol.upper()
-
-    plans = {15:'V.I.P Spoofer',25: '1 Day Plan', 89: '4 Days Plan', 149: '1 Week Plan', 299: '1 Month Plan', 999: 'LifeTime Plan'}
-    wallets = [{
-        'USDT': 'TY4Eh8RPdrhWSokWq9j9S4zVw7gd1Vrbaf',
-        'BTC': '1KhvoitTrnopPqhxR1ayZ2ERw3d1g5BfdC',
-        'ETH': '0x91ab56856eff7bc410fdac41c35a75d4e83410f6',
-        'SOL': 'GEPAmKTxPpM3mxYGze9CXmnSxAtZu1xQ9L9v7GEqmFts',
-        'LTC': 'LNFkiNNuqjLtY1vN4r3ihegnYfKmsc75Nm'
-    },
-    {
-        'USDT': 'THqWBtVxYRpWhgmMNd2M5nMkjTTVmsVgxh',
-        'BTC': '1M6Q4pFzofeBvA9e2CQ9rhtLyLkLc34p3q',
-        'ETH': '0x1c89c55def70cb0fccaf058abfc5a1e493d0e297',
-        'SOL': '5bPVRzUqc4ThfNST9uaKMn8PoS3xip1JxRShb8PWwWFW',
-        'LTC': 'LMWe7aWQkBcQZT5fzhfPDvZMHdYg9rwuwp'
-    }
-    ]
-
-    plan = plans.get(amount, "Unknown Plan")
-    wallet = wallets[wallet_type].get(symbol, "N/A")
-    amnt = usd_to_crypto(symbol, amount)
-    #now = escape_markdown(now)
-    #plan = escape_markdown(plan)
-    message = render_message('wallet_message',lang,symbol=symbol,amount=amnt,date=now,plan=plan,wallet=wallet,link=get_admin()['link'])
-    return message
 
 
