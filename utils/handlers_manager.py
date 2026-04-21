@@ -1,5 +1,4 @@
 from .database import db
-from .messages_manager import load_messages
 import asyncio
 
 # =========================
@@ -32,7 +31,6 @@ async def reload_users_every_12h():
         await asyncio.sleep(6 * 60 * 60)  # 12 hours
         print("⏳ 12h reached → reloading users")
         await load_all_users()
-        await load_messages()
 
 # =========================
 # USER HELPERS
@@ -56,11 +54,21 @@ async def add_user_fast(user_id: int):
             "banned": False,
             "expiry_date": "N/A",
             "script": "Default",
-            "rep": False,
             "wallet": 0,
             "caller_id": 'Default',
             'my_number': 'Not set',
-            'lang': '🇺🇸 English'
+            'lang': '🇺🇸 English',
+            'cus_script1': 'N/A',
+            'cus_script2': 'N/A',
+            'cus_script3': 'N/A',
+            'cus_script4': 'N/A',
+            'cus_script5': 'N/A',
+            'offer': 'N/A',
+            'referrals': 0,
+            'BOOLEAN DEFAULT FALSE': False,
+            'spoof': 'N/A',
+            'last_call': 'N/A',
+            'in_call': False
         }
 
 
@@ -72,11 +80,21 @@ async def update_user_cache(user_id: int, field: str, value):
                 "banned": False,
                 "expiry_date": "N/A",
                 "script": "Default",
-                "rep": False,
                 "wallet": 0,
                 "caller_id": 'Default',
                 'my_number': 'Not set',
-                'lang': '🇺🇸 English'
+                'lang': '🇺🇸 English',
+                'cus_script1': 'N/A',
+                'cus_script2': 'N/A',
+                'cus_script3': 'N/A',
+                'cus_script4': 'N/A',
+                'cus_script5': 'N/A',
+                'offer': 'N/A',
+                'referrals': 0,
+                'BOOLEAN DEFAULT FALSE': False,
+                'spoof': 'N/A',
+                'last_call': 'N/A',
+                'in_call': False
             }
 
         USER_CACHE[user_id][field] = value
