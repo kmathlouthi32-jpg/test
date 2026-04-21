@@ -6,18 +6,17 @@ import string
 import httpx
 
 class DBManager:
-    KEY_TYPES = {'2 hours', '1 day', '4 days', '1 week', '1 month', 'lifetime'}
+    KEY_TYPES = {'2 hours', '1 day', '3 days', '1 week', '1 month'}
     DURATION_MAP = {
     '2 hours': (timedelta(hours=2), '2 Hours'),
     '1 day': (timedelta(days=1), '1 Day'),
-    '4 days': (timedelta(days=4), '4 Days'),
+    '3 days': (timedelta(days=3), '3 Days'),
     '1 week': (timedelta(days=7), '1 Week'),
     '1 month': (timedelta(days=30), '1 Month'),
-    'lifetime': (timedelta(days=365*1000), 'Lifetime'),
     }
     ALLOWED_COLUMNS = {
-    "user_id", "banned", "expiry_date", "last_call", "voice",
-    "custom_script", "rep",'wallet'
+    "user_id", "banned", "expiry_date", 
+    "script", "rep",'wallet', "my_number", 'caller_id', 'lang', 'cus_script1', 'cus_script2', 'cus_script3', 'cus_script4', 'cus_script5','offer', 'referrals', 'referred', 'spoof', 'last_call', 'in_call'
     }
 
     def __init__(self, db_url: str):
@@ -67,11 +66,22 @@ class DBManager:
                     user_id BIGINT PRIMARY KEY,
                     banned BOOLEAN DEFAULT FALSE,
                     expiry_date TEXT DEFAULT 'N/A',
+                    script TEXT DEFAULT 'Default',
+                    wallet INT DEFAULT 0,
+                    caller_id TEXT DEFAULT 'Default',
+                    my_number TEXT DEFAULT 'Not set',
+                    lang TEXT DEFAULT '🇺🇸 English',
+                    cus_script1 TEXT DEFAULT 'N/A',
+                    cus_script2 TEXT DEFAULT 'N/A',
+                    cus_script3 TEXT DEFAULT 'N/A',
+                    cus_script4 TEXT DEFAULT 'N/A',
+                    cus_script5 TEXT DEFAULT 'N/A',
+                    offer TEXT DEFAULT 'N/A',
+                    referrals INT DEFAULT 0,
+                    referred BOOLEAN DEFAULT FALSE,
+                    spoof TEXT DEFAULT 'N/A',
                     last_call TEXT DEFAULT 'N/A',
-                    voice TEXT DEFAULT 'Michael',
-                    custom_script TEXT DEFAULT 'N/A',
-                    rep BOOLEAN DEFAULT FALSE,
-                    wallet INT DEFAULT 1
+                    in_call BOOLEAN DEFAULT FALSE
                 );
             """)
             await conn.execute("""
@@ -79,23 +89,6 @@ class DBManager:
                     key TEXT PRIMARY KEY,
                     used BOOLEAN DEFAULT FALSE,
                     key_type TEXT
-                );
-            """)
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS messages (
-                    key TEXT NOT NULL,
-                    lang TEXT NOT NULL,
-                    content TEXT NOT NULL,
-                    PRIMARY KEY (key, lang)
-                );
-            """)
-
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS keyboards (
-                    key TEXT NOT NULL,
-                    lang TEXT NOT NULL,
-                    buttons JSONB NOT NULL,
-                    PRIMARY KEY (key, lang)
                 );
             """)
 
@@ -147,15 +140,20 @@ class DBManager:
     def generate_key(self):
         return f"DragonOTP-{self.random_segment()}"
 
-    async def generate_new_key(self, conn, key_type: str):
+    async def generate_new_key(self, conn, key_type: str, key_plan: str):
         key = self.generate_key()
         await conn.execute(
-            "INSERT INTO keys (key, key_type, used) VALUES ($1, $2, FALSE)",
-            key, key_type
+            "INSERT INTO keys (key, key_type, plan_type ,used) VALUES ($1, $2, $3, FALSE)",
+            key, key_type, key_plan
         )
         return key
 
-    async def generate_bulk_keys(self, total_per_duration=5):
+    VALID_PLANS = {"subscription", "spoofing"}
+
+    async def generate_bulk_keys(self, total_per_duration=5, key_plan: str = "subscription"):
+        if key_plan not in self.VALID_PLANS:
+            raise ValueError(f"Invalid key_plan '{key_plan}'. Must be one of: {self.VALID_PLANS}")
+
         await self.init_db()
         async with self.pool.acquire() as conn:
             async with conn.transaction():
@@ -163,40 +161,34 @@ class DBManager:
                     for _ in range(total_per_duration):
                         try:
                             await conn.execute(
-                                "INSERT INTO keys (key, key_type, used) VALUES ($1, $2, FALSE)",
-                                self.generate_key(), duration
+                                "INSERT INTO keys (key, key_type, plan_type, used) VALUES ($1, $2, $3, FALSE)",
+                                self.generate_key(), duration, key_plan
                             )
                         except:
                             pass
-        return "✅ Keys generated."
+        return f"✅ Keys generated for plan: {key_plan}"
 
-    async def show_valid_keys(self, key_type):
+    async def show_valid_keys(self, key_type, plan_type):
         await self.init_db()
         async with self.pool.acquire() as conn:
             rows = await conn.fetch(
-                "SELECT key FROM keys WHERE key_type=$1 AND used=FALSE",
-                key_type
+                "SELECT key FROM keys WHERE key_type=$1 AND used=FALSE AND plan_type=$2",
+                key_type, plan_type
             )
             return [f"`{r['key']}`" for r in rows] or [r"⚠️ No available keys\."]
 
     # -----------------------------
     # KEY REDEMPTION
     # -----------------------------
-    async def redeem_key(self, user_id: int, key: str,expiry_date: str, rep: bool):
+    async def redeem_key(self, key: str,  expiry_date: str):
         await self.init_db()
         async with self.pool.acquire() as conn:
-            # Special rep key
-            if key == "DragonOTP-93J9YHKT8DKMXJC9YCRY":
-                if rep:
-                    return 'norep',None
-                await self.set_user_value(user_id, "rep", True)
-                return 'Repport Calls',None
+            row = await conn.fetchrow("SELECT key_type, plan_type, used FROM keys WHERE key=$1", key)
 
-            row = await conn.fetchrow("SELECT key_type, used FROM keys WHERE key=$1", key)
             if not row:
-                return 'wrong_key',None
+                return 'wrong_key',None, None
             if row["used"]:
-                return 'used_key',None
+                return 'used_key',None, None
 
             key_type = row["key_type"]
 
@@ -211,9 +203,9 @@ class DBManager:
             new_expiry = base + duration
 
             await conn.execute("UPDATE keys SET used=TRUE WHERE key=$1", key)
-            await self.generate_new_key(conn, key_type)
+            await self.generate_new_key(conn, key_type, row['plan_type'])
 
-            return label,new_expiry
+            return label,new_expiry, row['plan_type']
         
     async def set_message(self, key: str, lang: str, content: str):
         await self.init_db()
