@@ -1,33 +1,42 @@
-from config import get_spoofing, get_spoofing_services, get_servies, get_pre_spoofing_services, get_pre_spoofing_numbers
+from random import randint
 
-def check_spoof(spoof_number, service_name, name):
-    if name.upper() in get_spoofing_services():
-        return 'Name Found'
-    try:
-        service_place = get_spoofing_services().index(service_name.upper())
-    except ValueError:
-        if spoof_number == '12104735470':
-            return True
-        else:
-            return 'service not found'
-    
-    try:
-        spoof_place = get_spoofing().index(spoof_number)
-    except ValueError:
-        return 'number not found'
-
-    
-    return spoof_place == service_place
-
-def get_spoofer_number(service_name):
-    return get_pre_spoofing_numbers()[get_pre_spoofing_services().index(service_name.upper())]
-
-def get_service_name(service_name):
-        return service_name.lower()
-
-def get_service_name_bynum(num):
-    if num == '12104735470':
-        return 'VIP spoof'
-    return get_servies()[get_spoofing().index(num)]
-
-
+def get_random_caller():
+   spoofers = ["12062664001",
+        "16502530000",
+        "16505434800",
+        "14153650704",
+        "14156896300",
+        "12122706000",
+        "13157244022",
+        "19258257600",
+        "15034019991",
+        "19109148250",
+        "12106773775",
+        "14123034000",
+        "17038772000",
+        "18567519000",
+        "17168417212",
+        "12122706000",
+        "19258257600",
+        "15034019991",
+        "19109148250",
+        "12106773775",
+        "14123034000",
+        "17038772000",
+        "18567519000",
+        "17168417212",
+        "12105318722",
+        "13363931111",
+        "14125575000",
+        "18888884532",
+        "18664363393",
+        "18779243247",
+        "18889575862",
+        "18884880033",
+        "18557669669",
+        "18889986654",
+        "18666179347",
+        "18772552373",
+        "18444006348",
+        "18777442646" ]
+   return spoofers[randint(0,len(spoofers)-1)]
