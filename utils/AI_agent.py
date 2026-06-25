@@ -1,7 +1,7 @@
 import asyncio
 from groq import Groq
 
-client = Groq(api_key="xai-aWua3TSx8dAcRImIvlRQpVqisdSxykIsrdDowyiLrt4EMy7hhD0rrIngCplDLQdLesMtjnge1SNPw5yH")
+client = Groq(api_key="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")
 
 async def generate_script(description: str) -> str:
     response = await asyncio.to_thread(
