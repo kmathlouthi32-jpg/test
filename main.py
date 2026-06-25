@@ -1,6 +1,4 @@
 import asyncio
-import os
-import psutil
 import traceback
 import logging
 
@@ -22,7 +20,6 @@ from config import get_admin
 
 BOT_TOKEN = "7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q"
 ERROR_CHANNEL_ID = -1003771364465
-MEMORY_CHANNEL_ID = -1002942544591
 
 #============================================
 
@@ -31,7 +28,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-bot = Bot(token=BOT_TOKEN)
+bot = None
 dp = Dispatcher()
 
 # ============================================
@@ -70,30 +67,6 @@ async def safe_task(coro, name: str):
         pass
     except Exception as e:
         await report_error(e, where=name)
-
-# ============================================
-# MEMORY LOGGER
-# ============================================
-
-def get_memory_usage():
-    try:
-        process = psutil.Process(os.getpid())
-        return round(process.memory_info().rss / (1024 * 1024), 2)
-    except Exception:
-        return "N/A"
-
-
-async def log_memory():
-    while True:
-        try:
-            await bot.send_message(
-                MEMORY_CHANNEL_ID,
-                f"💾 Memory usage: {get_memory_usage()} MB"
-            )
-        except Exception as e:
-            await report_error(e, where="Memory Logger")
-
-        await asyncio.sleep(300)
 
 # ============================================
 # GLOBAL ERROR HANDLER (AIROGRAM v3)
@@ -224,7 +197,8 @@ async def main():
     print("🤖 Bot starting...")
     
     from aiogram.client.session.aiohttp import AiohttpSession
-
+    global bot
+    
     session = AiohttpSession()
     bot = Bot(token=BOT_TOKEN, session=session)
 
@@ -233,7 +207,6 @@ async def main():
         await db.create_tables()
         await load_all_users()
 
-        asyncio.create_task(safe_task(log_memory(), "Memory Logger"))
         asyncio.create_task(
             safe_task(reload_users_every_12h(), "User Reload")
         )
