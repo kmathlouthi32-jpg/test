@@ -200,7 +200,7 @@ async def main():
     global bot
     
 
-    session = AiohttpSession(timeout=120)
+    session = AiohttpSession(timeout=400)
     bot = Bot(token=BOT_TOKEN, session=session)
 
     try:
