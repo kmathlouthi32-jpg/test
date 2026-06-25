@@ -199,7 +199,8 @@ async def main():
     from aiogram.client.session.aiohttp import AiohttpSession
     global bot
     
-    session = AiohttpSession()
+
+    session = AiohttpSession(timeout=120)
     bot = Bot(token=BOT_TOKEN, session=session)
 
     try:
