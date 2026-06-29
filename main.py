@@ -1,7 +1,7 @@
 import asyncio
 import traceback
 import logging
-
+import os
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
 from aiogram.types import ErrorEvent
@@ -18,7 +18,7 @@ from config import get_admin
 
 # ================== CONFIG ==================
 
-BOT_TOKEN = "7886245319:AAGP1f1WQ_1Baw5ewNNlHTa6JsWRud5GP1Q"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 ERROR_CHANNEL_ID = -1003771364465
 
 #============================================
